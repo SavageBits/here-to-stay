@@ -22,6 +22,7 @@ export async function createExercise(
     createdAt: ts,
     updatedAt: ts,
     archivedAt: null,
+    lastTargetWeight: null,
   }
   await db.exercises.add(exercise)
   return exercise

@@ -45,6 +45,13 @@ export interface Exercise {
   createdAt: Timestamp
   updatedAt: Timestamp
   archivedAt: Timestamp | null
+  /**
+   * The exercise's target weight when it was last removed from a template. Lets
+   * a re-added exercise resume at its prior target even if it has no completed
+   * session history yet. `null`/absent for bodyweight or never-removed. Added in
+   * schema v3.
+   */
+  lastTargetWeight?: number | null
 }
 
 /**

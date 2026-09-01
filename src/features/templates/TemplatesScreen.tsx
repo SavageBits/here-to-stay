@@ -112,11 +112,10 @@ export function TemplatesScreen() {
                       <span className="readd-item__main">
                         <span className="readd-item__name">{ex.name}</span>
                         <span className="readd-item__meta">
-                          {ex.hasHistory
-                            ? ex.lastTarget !== null
-                              ? `resumes at ${fmtWeight(ex.lastTarget)} lb`
-                              : 'resumes as bodyweight'
-                            : 'no history yet'}
+                          {ex.lastTarget !== null
+                            ? `resumes at ${fmtWeight(ex.lastTarget)} lb`
+                            : 'bodyweight'}
+                          {ex.hasHistory ? ' · has history' : ''}
                         </span>
                       </span>
                       <span className="readd-item__add" aria-hidden>

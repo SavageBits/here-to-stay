@@ -56,6 +56,39 @@ describe('remove then re-add', () => {
     expect(historySnaps).toBeGreaterThan(0)
   })
 
+  it('resumes at the template target when removed before any completed session', async () => {
+    // Deadlift is seeded at target 135 and has NO completed history yet.
+    const { teId, exId } = await findTemplateExerciseId('Deadlift')
+    await removeExerciseFromTemplate(teId, db)
+
+    const readdable = await listReaddableExercises('A', db)
+    const candidate = readdable.find((r) => r.exerciseId === exId)
+    expect(candidate).toBeDefined()
+    expect(candidate!.hasHistory).toBe(false)
+    // The bug was: this resolved to null ("bodyweight"). It must be 135.
+    expect(candidate!.lastTarget).toBe(135)
+
+    // Re-adding restores that target.
+    const template = await getTemplate('A', db)
+    await addExerciseToTemplate(
+      template!.id,
+      { exerciseId: exId, targetWeight: candidate!.lastTarget },
+      db,
+    )
+    const views = await getTemplateExerciseViews('A', db)
+    expect(views.find((v) => v.exerciseId === exId)?.targetWeight).toBe(135)
+  })
+
+  it('preserves an edited target across remove/re-add (no completed history)', async () => {
+    // Edit Deadlift's target to 145, then remove and check the resume value.
+    const { teId, exId } = await findTemplateExerciseId('Deadlift')
+    await (await import('./templateRepo')).setTemplateTargetWeight(teId, 145, db)
+    await removeExerciseFromTemplate(teId, db)
+
+    const readdable = await listReaddableExercises('A', db)
+    expect(readdable.find((r) => r.exerciseId === exId)?.lastTarget).toBe(145)
+  })
+
   it('offers the removed exercise as re-addable, resuming at its last achieved target', async () => {
     // Success at 55 → next target 60.
     const { session, exercises } = await startSession('A', db)

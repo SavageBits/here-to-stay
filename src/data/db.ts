@@ -57,11 +57,17 @@ export class HealthDB extends Dexie {
       settings: 'id',
     })
 
+    // ---- Version 3 -------------------------------------------------------
+    // Adds Exercise.lastTargetWeight (a non-indexed field), so no `stores`
+    // change is required — the version bump alone lets Dexie persist the new
+    // field. Existing rows simply lack it (treated as null on read).
+    this.version(3).stores({})
+
     // ---- Future migrations ----------------------------------------------
     // When the schema changes, add a new version with only the changed tables
     // and an upgrade() to backfill. Example:
     //
-    // this.version(3)
+    // this.version(4)
     //   .stores({ weightEntries: 'id, &date, note' })
     //   .upgrade((tx) =>
     //     tx.table('weightEntries').toCollection().modify((e) => {

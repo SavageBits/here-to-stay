@@ -415,10 +415,27 @@ the old history stayed orphaned. Fixed:
 - [x] Fixed the misleading "archives the row" comment on
       `removeExerciseFromTemplate` (it deletes only the template slot; the
       logical exercise + snapshots persist).
-- [x] Tests: `readd.test.ts` (4) — snapshots retained after removal; offered as
+- [x] Tests: `readd.test.ts` — snapshots retained after removal; offered as
       re-addable at last target (60); re-add reuses id and a new session resumes
       at 60; creating a NEW same-name exercise does NOT reconnect history.
-      TemplatesScreen UI test for remove → re-add. **72 tests passing.**
+      TemplatesScreen UI test for remove → re-add.
+
+**Fix (user report): re-add defaulted to bodyweight when there was no completed
+history.** `listReaddableExercises` only looked at completed sessions, so an
+exercise removed before finishing any workout resolved its resume target to
+`null`. Fixed by persisting the slot's target onto the logical exercise on
+removal:
+- [x] Added `Exercise.lastTargetWeight` (**schema v3** — optional non-indexed
+      field, no backfill).
+- [x] `removeExerciseFromTemplate` now writes the removed slot's `targetWeight`
+      to `Exercise.lastTargetWeight`.
+- [x] `listReaddableExercises` resolves the resume target as: completed-history
+      target if any, else `Exercise.lastTargetWeight` — so a re-add restores the
+      prior (or edited) target even with no completed history.
+- [x] Picker label updated to always show the resume target.
+- [x] Tests added: resumes at seeded target 135 (not bodyweight) when removed
+      before completion; preserves an edited target (145) across remove/re-add.
+      **74 tests passing.**
 
 ---
 

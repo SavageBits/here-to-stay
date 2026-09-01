@@ -66,9 +66,10 @@ export interface ReaddableExercise {
   exerciseId: string
   name: string
   /**
-   * Target to resume at: the most recent completed session's next target, else
-   * that session's target snapshot. `null` when it has no completed history
-   * (bodyweight or never finished) — the exercise resumes as bodyweight.
+   * Target to resume at: the most recent completed session's next target if the
+   * exercise has completed history; otherwise the target it had when last
+   * removed from a template (`Exercise.lastTargetWeight`). `null` only for a
+   * genuine bodyweight exercise with no recorded target.
    */
   lastTarget: number | null
   /** Whether the exercise has any completed-session history. */
@@ -101,7 +102,7 @@ export async function listReaddableExercises(
       .where('exerciseId')
       .equals(ex.id)
       .toArray()
-    let lastTarget: number | null = null
+    let historyTarget: number | null = null
     let hasHistory = false
     let latestCompletedAt = ''
     for (const we of workoutExercises) {
@@ -110,9 +111,12 @@ export async function listReaddableExercises(
       hasHistory = true
       if (session.completedAt > latestCompletedAt) {
         latestCompletedAt = session.completedAt
-        lastTarget = we.nextTargetWeight ?? we.targetWeightSnapshot
+        historyTarget = we.nextTargetWeight ?? we.targetWeightSnapshot
       }
     }
+    // Prefer the completed-history target; otherwise the target the exercise had
+    // when it was last removed from a template (Exercise.lastTargetWeight).
+    const lastTarget = hasHistory ? historyTarget : (ex.lastTargetWeight ?? null)
     result.push({ exerciseId: ex.id, name: ex.name, lastTarget, hasHistory })
   }
 
@@ -165,9 +169,15 @@ export async function removeExerciseFromTemplate(
   templateExerciseId: string,
   db: HealthDB = defaultDb,
 ): Promise<void> {
-  await db.transaction('rw', db.templateExercises, async () => {
+  await db.transaction('rw', db.templateExercises, db.exercises, async () => {
     const row = await db.templateExercises.get(templateExerciseId)
     if (!row) return
+    // Remember the slot's target on the logical exercise so a re-add can resume
+    // at it even before any completed session exists.
+    await db.exercises.update(row.exerciseId, {
+      lastTargetWeight: row.targetWeight,
+      updatedAt: nowTimestamp(),
+    })
     await db.templateExercises.delete(templateExerciseId)
     // Re-pack sortOrder so it stays 0..n-1.
     const remaining = await listTemplateExercises(row.workoutTemplateId, db)
