@@ -245,13 +245,37 @@ a non-blocking optimization).
 
 ---
 
-## Phase 6 — Workout Templates Feature (PRD §6)
+## Phase 6 — Workout Templates Feature (PRD §6)  ✅ COMPLETE (2026-08-31)
 
-- [ ] Templates screen for Workout A and B.
-- [ ] Add / rename / remove(archive) / reorder exercises.
-- [ ] Renaming edits the logical exercise, never past workout snapshots.
-- [ ] **Acceptance (PRD §18 templates):** have A & B; add/rename/remove/reorder;
-      history unchanged after edits.
+**58 tests passing (adds 5 template-flow tests). Typecheck, lint, build clean.**
+
+- [x] Templates screen with an A / B tab switch (`useTemplate` live-query hook
+      joins template-exercise rows to their current logical exercises).
+- [x] Add exercise (name + optional target weight; blank target = bodyweight),
+      rename (inline, tap the name), remove (confirm dialog; archives the row so
+      history is preserved), reorder (thumb-friendly ↑/↓ controls with
+      sortOrder re-packing).
+- [x] Per-exercise target-weight editing via `setTemplateTargetWeight`.
+- [x] Renaming edits the logical exercise only — historical
+      `exerciseNameSnapshot` values are untouched (verified by the Phase 3 repo
+      test "rename does not rewrite historical snapshots").
+- [x] **Acceptance (PRD §18 templates):** Workout A & B exist ✓; add / rename /
+      remove / reorder ✓; historical workouts unchanged after edits ✓
+      (repo-tested).
+
+**Tests added (`TemplatesScreen.test.tsx`):** shows seeded exercises; add;
+rename (old name gone, new name shown); remove after confirm; reorder via
+move-down.
+
+**Notes:**
+- Reorder uses ↑/↓ buttons rather than drag-and-drop — simpler, more reliable on
+  touch, and no extra dependency. Drag-and-drop is a possible later polish.
+- Target-weight edits write on every change (debounce-free); fine at this scale.
+- Bundle now ~773 KB (225 KB gzip) — Recharts still dominates; unchanged stance
+  (code-split later if desired).
+
+**Next:** Phase 7 — Workout Logging (start-from-previous, set entry with
+auto-add, complete + progression). This is the biggest UI phase.
 
 ---
 

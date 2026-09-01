@@ -402,3 +402,86 @@ a.btn {
   justify-content: center;
   text-decoration: none;
 }
+
+/* ---- Templates feature ---- */
+.template-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.template-row__head {
+  margin-bottom: 0.6rem;
+}
+
+.template-row__name {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.template-row__name::after {
+  content: ' ✎';
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.template-row__rename,
+.template-row__reorder {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.template-row__rename input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+  padding: 0.6rem 0.75rem;
+  min-width: 0;
+}
+
+.template-row__controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.template-row__target {
+  flex: 1;
+  max-width: 180px;
+}
+
+.template-row__reorder .btn {
+  padding: 0.4rem 0.7rem;
+  min-height: 40px;
+  min-width: 40px;
+}
+
+.template-add__target {
+  margin: 0.75rem 0;
+}
+
+/* Plain text inputs inside a number-field control (name fields). */
+.number-field__control input[type='text'] {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 1.1rem;
+  padding: 0.75rem 0;
+  min-width: 0;
+}
+
+.number-field__control input[type='text']:focus {
+  outline: none;
+}
