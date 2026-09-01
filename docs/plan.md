@@ -65,41 +65,60 @@ workout builder).
 
 ---
 
-## Phase 2 — Pure Business Logic (test-first)
+## Phase 2 — Pure Business Logic (test-first)  ✅ COMPLETE (2026-08-31)
 
-### Progressive Overload (`domain/progression.ts`) — PRD §9, §16, §20
+**37 tests passing across the three modules. Typecheck + lint clean.**
 
-- [ ] Implement `evaluateProgression(input): ProgressionOutcome`.
-- [ ] Constants: `TARGET_REP_GOAL = 12`, `PROGRESSION_INCREMENT_LB = 5`.
-- [ ] Success rule: ≥1 set, every set reps ≥ 12, every set weight ≥ target.
-- [ ] Success → target + 5; failure → target unchanged (never reduced).
-- [ ] Skipped → unchanged; bodyweight (null/0 target) → no progression.
-- [ ] **Tests (required by PRD §20):**
-  - [ ] `55x12 ×4` → next 60.
-  - [ ] `60x12, 60x12, 60x10, 55x12` → stays 60.
-  - [ ] `60x12 ×4` → next 65.
-  - [ ] One set below target weight → no increase.
-  - [ ] One set below 12 reps → no increase.
-  - [ ] All sets above 12 reps → success.
-  - [ ] Exercise skipped → unchanged.
-  - [ ] Bodyweight exercise → no +5 rule.
-  - [ ] Re-evaluating an unchanged completed workout does **not** re-increment.
+### Progressive Overload (`domain/progression.ts`) — PRD §9, §16, §20  ✅
 
-### Weight Stats (`domain/weightStats.ts`) — PRD §5.2, §5.3, §20
+- [x] Implement `evaluateProgression(input): ProgressionOutcome`.
+- [x] Constants: `TARGET_REP_GOAL = 12`, `PROGRESSION_INCREMENT_LB = 5`.
+- [x] Success rule: ≥1 set, every set reps ≥ 12, every set weight ≥ target.
+- [x] Success → target + 5; failure → target unchanged (never reduced).
+- [x] Skipped → unchanged; bodyweight (null/0 target) → no progression.
+- [x] **Tests (required by PRD §20)** — 14 tests, all passing:
+  - [x] `55x12 ×4` → next 60.
+  - [x] `60x12, 60x12, 60x10, 55x12` → stays 60.
+  - [x] `60x12 ×4` → next 65.
+  - [x] One set below target weight → no increase.
+  - [x] One set below 12 reps → no increase.
+  - [x] All sets above 12 reps → success.
+  - [x] Exercise skipped → unchanged.
+  - [x] Bodyweight exercise → no +5 rule (both null and 0 target).
+  - [x] Re-evaluating an unchanged completed workout does **not** re-increment.
+  - [x] Full 55 → 60 → 60 → 65 sequence (PRD §9.4) walked end-to-end.
 
-- [ ] Implement `sevenDayAverage` (mean of existing entries in the 7-day window;
-      missing days excluded, never zero).
-- [ ] Implement `trendDelta` (avg today − avg 7 days ago) and `trendLabel`
+### Weight Stats (`domain/weightStats.ts`) — PRD §5.2, §5.3, §20  ✅
+
+- [x] Implement `sevenDayAverage` (mean of existing entries in the 7-day window;
+      missing days excluded, never zero; returns `null` for an empty window).
+- [x] Implement `trendDelta` (avg today − avg 7 days ago) and `trendLabel`
       (±0.25 lb thresholds).
-- [ ] Implement `movingAverageSeries` for the chart (per range).
-- [ ] **Tests:** exactly 7 entries, fewer than 7, missing days, edited entries,
-      deleted entries, trend thresholds (down/flat/up).
+- [x] Implement `movingAverageSeries` for the chart (per range; window can reach
+      across the range boundary so edge points aren't truncated).
+- [x] **Tests** — 15 tests: exactly 7 entries, fewer than 7, missing days,
+      out-of-window entries, edited entries, deleted entries, empty window,
+      trend delta + null cases, thresholds (down/flat/up/null), series ordering.
 
-### Workout Builder (`domain/workoutBuilder.ts`) — PRD §7, §8
+### Workout Builder (`domain/workoutBuilder.ts`) — PRD §7, §8  ✅
 
-- [ ] Implement `buildSessionFromPrevious` (copy order/current names/target,
-      not reps; default 12; fall back to template when no previous).
-- [ ] **Tests:** first-ever A/B, builds from previous, reps not copied, default 12.
+- [x] Implement `buildSessionFromPrevious` (copy order/current names/target,
+      not reps; seed one set defaulted to 12; fall back to template when no
+      previous; use current template names even after a rename; respect
+      added/removed exercises via the current template set).
+- [x] **Tests** — 8 tests: first-ever A/B, builds from previous, previous
+      next-target used, template fallback for newly-added exercises, current
+      names win over snapshots, removed exercises dropped, reps not copied,
+      default 12, sort order.
+
+**Notes:**
+- Removed the Phase 0 smoke test now that real domain tests exist.
+- `buildSessionFromPrevious` takes a `PreviousExerciseResult[]` (the prior
+  session's per-exercise `nextTargetWeight`) rather than a whole session object,
+  keeping the function pure and easy to test; sessionRepo will assemble this in
+  Phase 3.
+
+**Next:** Phase 3 — persistence layer (Dexie schema + repositories).
 
 ---
 
