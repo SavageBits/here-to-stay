@@ -368,11 +368,33 @@ Reworked the active-workout UI from a scrollable list of exercise cards to a
 
 ---
 
-## Phase 9 — History Feature (PRD §12, §13)
+## Phase 9 — History Feature (PRD §12, §13)  ✅ COMPLETE (2026-08-31)
 
-- [ ] Workout history list (date, A/B, # exercises completed, short summary).
-- [ ] Workout detail (targets, sets, "target retained/advanced"); editable.
-- [ ] Exercise history (dates, target, actual weights, reps, achieved?, next target).
+**67 tests passing (adds 4 history tests). Typecheck, lint, build clean.**
+
+- [x] Workout history list (`HistoryScreen`): completed sessions most-recent
+      first — Workout A/B, # exercises completed, completion date; tap a row →
+      detail. Empty state when no history.
+- [x] Workout detail (`WorkoutDetailScreen`): per exercise shows target, the
+      sets performed, and the progression outcome ("Target advanced X → Y" or
+      "Target retained X"); "Skipped" badge for incomplete exercises. **Editable**
+      via "Edit workout" → `reopenSession` → logging view; re-completion recomputes
+      progression deterministically (no double +5, repo-tested Phase 3). Link to
+      each exercise's history.
+- [x] Exercise history (`ExerciseHistoryScreen`): for one logical exercise, each
+      completed session's date, workout type, target, actual weights × reps, and
+      achieved?/next-target.
+- [x] Live-query hooks (`useHistory.ts`): `useWorkoutHistory`, `useSessionDetail`,
+      `useExerciseHistory`.
+- [x] **Acceptance (PRD §12, §13):** history list ✓; detail with targets/sets/
+      result ✓; edit past workouts without corrupting progression ✓ (reopen +
+      idempotent recompute); exercise history with achieved/next target ✓.
+
+**Tests added (`history.test.tsx`):** lists a completed workout; empty state;
+detail shows "Target advanced: 55 → 60"; exercise history lists sessions with
+"Achieved → next 60".
+
+**Next:** Phase 10 — Settings, Backup & PWA (export/import JSON+CSV; PWA verify).
 
 ---
 

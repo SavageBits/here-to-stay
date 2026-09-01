@@ -761,3 +761,118 @@ a.btn {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+/* ---- History ---- */
+.history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-decoration: none;
+  color: var(--text);
+  min-height: 64px;
+}
+
+.history-row__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.history-row__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.history-row__meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.history-row__date {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- Workout / exercise detail ---- */
+.detail-exercise__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.detail-exercise__name {
+  margin: 0 0 0.35rem;
+  font-size: 1.1rem;
+}
+
+.detail-exercise__target {
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.detail-sets {
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-sets__row {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.05rem;
+}
+
+.detail-exercise__result {
+  font-weight: 700;
+  margin: 0.5rem 0 0;
+}
+
+.result--up {
+  color: var(--success);
+}
+
+.result--flat {
+  color: var(--muted);
+}
+
+.detail-exercise__link {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.8rem;
+  min-height: 40px;
+  font-size: 0.85rem;
+}
+
+.detail__back {
+  margin-top: 0.6rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badge--muted {
+  background: var(--surface-2);
+  color: var(--muted);
+}
