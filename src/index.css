@@ -53,7 +53,11 @@ h1 {
 
 .app-content {
   flex: 1;
-  padding: 1rem 1rem calc(var(--nav-height) + 1rem);
+  /* Top padding includes the iOS safe-area inset so the header clears the
+     status bar in standalone PWA mode (black-translucent status bar draws
+     content behind it). Side padding respects notch insets too. */
+  padding: calc(1rem + env(safe-area-inset-top)) calc(1rem + env(safe-area-inset-right))
+    calc(var(--nav-height) + 1rem) calc(1rem + env(safe-area-inset-left));
   max-width: 640px;
   margin: 0 auto;
   width: 100%;
