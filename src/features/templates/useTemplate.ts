@@ -11,6 +11,10 @@ import type {
   WorkoutTemplateExercise,
 } from '../../domain/entities'
 import type { WorkoutType } from '../../domain/types'
+import {
+  listReaddableExercises,
+  type ReaddableExercise,
+} from '../../data/repositories/templateRepo'
 
 /** A template-exercise row joined with its current logical exercise. */
 export interface TemplateRow {
@@ -44,4 +48,12 @@ export function useTemplate(type: WorkoutType): TemplateView | undefined {
     }
     return { template, rows }
   }, [type])
+}
+
+/**
+ * Previously-used exercises not currently in this template — candidates to
+ * re-add with their history and resume target intact.
+ */
+export function useReaddableExercises(type: WorkoutType): ReaddableExercise[] | undefined {
+  return useLiveQuery(() => listReaddableExercises(type), [type])
 }

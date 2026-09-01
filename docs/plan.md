@@ -396,6 +396,30 @@ detail shows "Target advanced: 55 → 60"; exercise history lists sessions with
 
 **Next:** Phase 10 — Settings, Backup & PWA (export/import JSON+CSV; PWA verify).
 
+### Phase 6.1 — Re-add removed exercises with history (user question, 2026-08-31)  ✅
+
+**Question:** after removing an exercise from a workout, can you add it back later
+and keep its historical data? **Before:** history survived, but "Add exercise"
+always created a *new* logical exercise (new id), so re-adding started fresh and
+the old history stayed orphaned. Fixed:
+
+- [x] `listReaddableExercises(type)`: logical exercises not currently in the
+      template (and not archived), each with its **last achieved target** (most
+      recent completed session's next target) and a `hasHistory` flag.
+- [x] `useReaddableExercises` live-query hook.
+- [x] TemplatesScreen "Add existing exercise" picker: lists previously-used
+      exercises with "resumes at N lb / bodyweight / no history yet"; tapping
+      re-adds via the **same `exerciseId`**, so history + progression reconnect
+      and it resumes at the last achieved target. "Add new exercise" form
+      unchanged for genuinely new exercises.
+- [x] Fixed the misleading "archives the row" comment on
+      `removeExerciseFromTemplate` (it deletes only the template slot; the
+      logical exercise + snapshots persist).
+- [x] Tests: `readd.test.ts` (4) — snapshots retained after removal; offered as
+      re-addable at last target (60); re-add reuses id and a new session resumes
+      at 60; creating a NEW same-name exercise does NOT reconnect history.
+      TemplatesScreen UI test for remove → re-add. **72 tests passing.**
+
 ---
 
 ## Phase 10 — Settings, Backup & PWA (PRD §19)

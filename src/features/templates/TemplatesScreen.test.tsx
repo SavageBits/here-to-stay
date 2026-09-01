@@ -85,4 +85,28 @@ describe('TemplatesScreen', () => {
       expect(namesAfter[1]).toContain('Deadlift')
     })
   })
+
+  it('offers a removed exercise for re-adding, then restores it to the template', async () => {
+    const user = userEvent.setup()
+    render(<TemplatesScreen />)
+    await waitFor(() => expect(screen.getByText('Plank')).toBeInTheDocument())
+
+    // Remove Plank.
+    await user.click(screen.getByRole('button', { name: 'Remove Plank' }))
+    const dialog = screen.getByRole('alertdialog')
+    await user.click(within(dialog).getByRole('button', { name: 'Remove' }))
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Rename Plank' })).not.toBeInTheDocument())
+
+    // It now appears under "Add existing exercise".
+    const readdCard = (await screen.findByText('Add existing exercise')).closest(
+      '.card',
+    ) as HTMLElement
+    const addBtn = within(readdCard).getByText('Plank').closest('button') as HTMLElement
+    await user.click(addBtn)
+
+    // Back in the template as an editable exercise.
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Rename Plank' })).toBeInTheDocument(),
+    )
+  })
 })

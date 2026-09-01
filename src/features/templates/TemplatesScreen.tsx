@@ -16,11 +16,14 @@ import {
   setTemplateTargetWeight,
 } from '../../data/repositories/templateRepo'
 import { renameExercise } from '../../data/repositories/exerciseRepo'
-import { useTemplate, type TemplateRow } from './useTemplate'
+import { fmtWeight } from '../weight/format'
+import { useReaddableExercises, useTemplate, type TemplateRow } from './useTemplate'
+import type { ReaddableExercise } from '../../data/repositories/templateRepo'
 
 export function TemplatesScreen() {
   const [type, setType] = useState<WorkoutType>('A')
   const view = useTemplate(type)
+  const readdable = useReaddableExercises(type)
 
   const [newName, setNewName] = useState('')
   const [newTarget, setNewTarget] = useState<number | null>(null)
@@ -32,6 +35,16 @@ export function TemplatesScreen() {
     await addExerciseToTemplate(view.template.id, { name, targetWeight: newTarget })
     setNewName('')
     setNewTarget(null)
+  }
+
+  async function handleReadd(ex: ReaddableExercise) {
+    if (!view) return
+    // Reuse the same logical exercise so history + progression are retained,
+    // resuming at its last achieved target.
+    await addExerciseToTemplate(view.template.id, {
+      exerciseId: ex.exerciseId,
+      targetWeight: ex.lastTarget,
+    })
   }
 
   async function move(index: number, delta: number) {
@@ -81,8 +94,43 @@ export function TemplatesScreen() {
           </ul>
           {view.rows.length === 0 && <p className="muted">No exercises yet.</p>}
 
+          {readdable && readdable.length > 0 && (
+            <div className="card">
+              <h2 className="card__title">Add existing exercise</h2>
+              <p className="muted readd__hint">
+                Re-add a previously-used exercise. Its history and progression are
+                kept.
+              </p>
+              <ul className="readd-list">
+                {readdable.map((ex) => (
+                  <li key={ex.exerciseId}>
+                    <button
+                      type="button"
+                      className="readd-item"
+                      onClick={() => handleReadd(ex)}
+                    >
+                      <span className="readd-item__main">
+                        <span className="readd-item__name">{ex.name}</span>
+                        <span className="readd-item__meta">
+                          {ex.hasHistory
+                            ? ex.lastTarget !== null
+                              ? `resumes at ${fmtWeight(ex.lastTarget)} lb`
+                              : 'resumes as bodyweight'
+                            : 'no history yet'}
+                        </span>
+                      </span>
+                      <span className="readd-item__add" aria-hidden>
+                        + Add
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="card">
-            <h2 className="card__title">Add exercise</h2>
+            <h2 className="card__title">Add new exercise</h2>
             <label className="number-field">
               <span className="number-field__label">Name</span>
               <span className="number-field__control">

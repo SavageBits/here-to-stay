@@ -61,6 +61,65 @@ export async function getTemplateExerciseViews(
   return views
 }
 
+/** An exercise that can be re-added to a template, with its resume target. */
+export interface ReaddableExercise {
+  exerciseId: string
+  name: string
+  /**
+   * Target to resume at: the most recent completed session's next target, else
+   * that session's target snapshot. `null` when it has no completed history
+   * (bodyweight or never finished) — the exercise resumes as bodyweight.
+   */
+  lastTarget: number | null
+  /** Whether the exercise has any completed-session history. */
+  hasHistory: boolean
+}
+
+/**
+ * Logical exercises that are NOT currently in the given template and are not
+ * archived — i.e. candidates to (re-)add, each with the target it should resume
+ * at (its last achieved target). Sorted by name.
+ */
+export async function listReaddableExercises(
+  type: WorkoutType,
+  db: HealthDB = defaultDb,
+): Promise<ReaddableExercise[]> {
+  const template = await getTemplate(type, db)
+  if (!template) return []
+
+  const inTemplate = new Set(
+    (await listTemplateExercises(template.id, db)).map((r) => r.exerciseId),
+  )
+  const candidates = (await db.exercises.toArray()).filter(
+    (e) => e.archivedAt === null && !inTemplate.has(e.id),
+  )
+
+  const result: ReaddableExercise[] = []
+  for (const ex of candidates) {
+    // Most recent COMPLETED session that included this exercise → resume target.
+    const workoutExercises = await db.workoutExercises
+      .where('exerciseId')
+      .equals(ex.id)
+      .toArray()
+    let lastTarget: number | null = null
+    let hasHistory = false
+    let latestCompletedAt = ''
+    for (const we of workoutExercises) {
+      const session = await db.workoutSessions.get(we.workoutSessionId)
+      if (!session || session.status !== 'completed' || !session.completedAt) continue
+      hasHistory = true
+      if (session.completedAt > latestCompletedAt) {
+        latestCompletedAt = session.completedAt
+        lastTarget = we.nextTargetWeight ?? we.targetWeightSnapshot
+      }
+    }
+    result.push({ exerciseId: ex.id, name: ex.name, lastTarget, hasHistory })
+  }
+
+  result.sort((a, b) => a.name.localeCompare(b.name))
+  return result
+}
+
 /**
  * Add an exercise to a template. Creates the logical exercise if a name is
  * given, or reuses an existing `exerciseId`. Appended at the end.
@@ -96,7 +155,12 @@ export async function addExerciseToTemplate(
   })
 }
 
-/** Remove an exercise from future workouts (archives the row; history intact). */
+/**
+ * Remove an exercise from a template's future workouts. Deletes only the
+ * template slot — the logical Exercise and all historical WorkoutExercise
+ * snapshots are left intact, so the exercise can be re-added later (see
+ * `listReaddableExercises`) with its history and progression restored.
+ */
 export async function removeExerciseFromTemplate(
   templateExerciseId: string,
   db: HealthDB = defaultDb,
