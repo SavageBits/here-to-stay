@@ -77,7 +77,10 @@ export function buildSessionFromPrevious(
       exerciseNameSnapshot: t.name, // current name, per PRD §7.3
       sortOrder: t.sortOrder,
       targetWeightSnapshot: target,
-      sets: [{ setNumber: 1, weight: target, reps: DEFAULT_REPS }],
+      // No sets are seeded: the focused logging view starts at "Set 1" and the
+      // user records each set explicitly. Reps still default to 12 (DEFAULT_REPS)
+      // in the UI when recording (PRD §7.5, §8.1).
+      sets: [],
     }
   })
 

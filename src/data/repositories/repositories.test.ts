@@ -68,9 +68,8 @@ describe('sessionRepo — start from previous (PRD §7)', () => {
     const { exercises } = await startSession('A', db)
     const incline = exercises.find((e) => e.exerciseNameSnapshot === 'Dumbbell Incline Press')
     expect(incline?.targetWeightSnapshot).toBe(55)
-    // Each exercise seeded with exactly one default set at 12 reps.
-    expect(incline?.sets).toHaveLength(1)
-    expect(incline?.sets[0].reps).toBe(12)
+    // No sets are seeded — the focused view starts at Set 1 (user records each).
+    expect(incline?.sets).toHaveLength(0)
   })
 
   it('a completed successful session advances the next session’s target by 5', async () => {
@@ -79,8 +78,8 @@ describe('sessionRepo — start from previous (PRD §7)', () => {
     const incline = first.exercises.find(
       (e) => e.exerciseNameSnapshot === 'Dumbbell Incline Press',
     )!
-    // Perform 55x12 x4: default set is already 55x12; add three more.
-    await updateSet(incline.sets[0].id, { weight: 55, reps: 12 }, db)
+    // Perform 55x12 x4.
+    await addSet(incline.id, { weight: 55, reps: 12 }, db)
     await addSet(incline.id, { weight: 55, reps: 12 }, db)
     await addSet(incline.id, { weight: 55, reps: 12 }, db)
     await addSet(incline.id, { weight: 55, reps: 12 }, db)
@@ -103,7 +102,7 @@ describe('sessionRepo — idempotency (PRD §11, §16.15)', () => {
     const incline = s.exercises.find(
       (e) => e.exerciseNameSnapshot === 'Dumbbell Incline Press',
     )!
-    await updateSet(incline.sets[0].id, { weight: 55, reps: 12 }, db)
+    await addSet(incline.id, { weight: 55, reps: 12 }, db)
     await addSet(incline.id, { weight: 55, reps: 12 }, db)
     await db.workoutExercises.update(incline.id, { completed: true })
 
@@ -129,13 +128,13 @@ describe('sessionRepo — idempotency (PRD §11, §16.15)', () => {
     const incline = s.exercises.find(
       (e) => e.exerciseNameSnapshot === 'Dumbbell Incline Press',
     )!
-    await updateSet(incline.sets[0].id, { weight: 55, reps: 12 }, db)
+    const set = await addSet(incline.id, { weight: 55, reps: 12 }, db)
     await db.workoutExercises.update(incline.id, { completed: true })
     await completeSession(s.session.id, db)
     expect((await db.workoutExercises.get(incline.id))!.nextTargetWeight).toBe(60)
 
     // Edit a set down to a failing rep count and recompute.
-    await updateSet(incline.sets[0].id, { weight: 55, reps: 8 }, db)
+    await updateSet(set.id, { weight: 55, reps: 8 }, db)
     await recomputeSession(s.session.id, db)
     const after = (await db.workoutExercises.get(incline.id))!
     expect(after.progressionAchieved).toBe(false)

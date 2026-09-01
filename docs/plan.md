@@ -349,6 +349,12 @@ Reworked the active-workout UI from a scrollable list of exercise cards to a
       → Save advances Set 1→2 in place → Done returns to list → complete advances
       target); added `afterExercise.test.tsx` ('next' advances to the following
       exercise). **63 tests passing.**
+- [x] **Fix (user report):** newly-started exercises no longer pre-seed a Set 1,
+      so the focused view correctly opens at "Set 1" instead of "Set 2".
+      `buildSessionFromPrevious` now seeds zero sets (reps still default to 12 in
+      the UI when recording). Updated the builder/repository/screen tests that
+      previously assumed one seeded set. Note: only affects sessions started
+      after this change; a pre-existing in-progress session keeps its stray set.
 
 ---
 

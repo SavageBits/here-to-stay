@@ -88,17 +88,18 @@ describe('buildSessionFromPrevious — with a previous session', () => {
 })
 
 describe('buildSessionFromPrevious — set defaults (PRD §7.4-7.5, §8.1)', () => {
-  it('does not copy completed reps; seeds a single set defaulted to 12 reps', () => {
+  it('seeds no sets; the focused view starts at Set 1 and the user records each', () => {
     const template = [tmpl('e1', 'Incline Press', 0, 55)]
     const previous: PreviousExerciseResult[] = [{ exerciseId: 'e1', nextTargetWeight: 60 }]
     const draft = buildSessionFromPrevious('A', template, previous)
 
     const ex = draft.exercises[0]
-    expect(ex.sets).toHaveLength(1)
-    expect(ex.sets[0].reps).toBe(DEFAULT_REPS)
-    expect(ex.sets[0].reps).toBe(12)
-    // The first set's weight defaults to the suggested target.
-    expect(ex.sets[0].weight).toBe(60)
+    // No pre-recorded sets are copied from the previous session (PRD §7.4).
+    expect(ex.sets).toHaveLength(0)
+    // The suggested target is still carried on the exercise for pre-fill.
+    expect(ex.targetWeightSnapshot).toBe(60)
+    // Reps default to 12 when the UI records a set.
+    expect(DEFAULT_REPS).toBe(12)
   })
 
   it('sorts exercises by the template sortOrder', () => {

@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { db } from '../../data/db'
 import { seedIfEmpty } from '../../data/seed'
-import { startSession } from '../../data/repositories/sessionRepo'
+import { addSet, startSession } from '../../data/repositories/sessionRepo'
 import { getTemplateExerciseViews } from '../../data/repositories/templateRepo'
 import { WorkoutScreen } from './WorkoutScreen'
 
@@ -46,15 +46,15 @@ describe('WorkoutScreen (focused redesign)', () => {
     const { session } = await startSession('A', db)
     renderAt(session.id)
     await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
-    expect(screen.getByText(/Target 135\.0 lb · 1 set/)).toBeInTheDocument()
+    // Exercises start with no recorded sets.
+    expect(screen.getByText(/Target 135\.0 lb · 0 sets/)).toBeInTheDocument()
   })
 
   it('focuses an exercise and records a set in place, advancing the indicator', async () => {
     const user = userEvent.setup()
     const { session, exercises } = await startSession('A', db)
     const incline = exercises.find((e) => e.exerciseNameSnapshot === 'Dumbbell Incline Press')!
-    // Start from a clean slate for this exercise so set numbering is predictable.
-    await db.exerciseSets.where('workoutExerciseId').equals(incline.id).delete()
+    // Sessions start with no seeded sets, so numbering begins at Set 1.
 
     renderAt(session.id)
     await waitFor(() => expect(screen.getByText('Dumbbell Incline Press')).toBeInTheDocument())
@@ -94,6 +94,8 @@ describe('WorkoutScreen (focused redesign)', () => {
     const user = userEvent.setup()
     const { session, exercises } = await startSession('A', db)
     const incline = exercises.find((e) => e.exerciseNameSnapshot === 'Dumbbell Incline Press')!
+    // Record a qualifying set (target 55) and mark the exercise done.
+    await addSet(incline.id, { weight: 55, reps: 12 }, db)
     await db.workoutExercises.update(incline.id, { completed: true })
 
     renderAt(session.id)
