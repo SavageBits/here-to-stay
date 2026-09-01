@@ -18,7 +18,10 @@ interface FocusedExerciseProps {
   onRecordSet: (weight: number | null, reps: number) => Promise<void> | void
   onEditSet: (setId: string, weight: number | null, reps: number) => Promise<void> | void
   onDeleteSet: (setId: string) => Promise<void> | void
+  /** "Done with Exercise": marks the exercise complete, then advances/returns. */
   onDone: () => void
+  /** "← Exercises": returns to the list WITHOUT marking the exercise complete. */
+  onBack: () => void
 }
 
 export function FocusedExercise({
@@ -27,6 +30,7 @@ export function FocusedExercise({
   onEditSet,
   onDeleteSet,
   onDone,
+  onBack,
 }: FocusedExerciseProps) {
   const recorded = exercise.sets
   const nextSetNumber = recorded.length + 1
@@ -49,7 +53,7 @@ export function FocusedExercise({
 
   return (
     <section className="screen focus">
-      <button type="button" className="focus__back" onClick={onDone} aria-label="Back to exercises">
+      <button type="button" className="focus__back" onClick={onBack} aria-label="Back to exercises">
         ← Exercises
       </button>
 

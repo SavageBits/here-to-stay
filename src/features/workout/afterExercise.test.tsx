@@ -58,4 +58,64 @@ describe('after-exercise behavior', () => {
     )
     expect(screen.getByText('Set 1')).toBeInTheDocument()
   })
+
+  it("'← Exercises' returns to the list WITHOUT cycling, even in 'next' mode", async () => {
+    const user = userEvent.setup()
+    await setAfterExercise('next', db)
+    const { session } = await startSession('A', db)
+    renderAt(session.id)
+
+    await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
+    await user.click(screen.getByText('Deadlift'))
+    await waitFor(() => expect(screen.getByText('Set 1')).toBeInTheDocument())
+
+    await user.click(screen.getByRole('button', { name: 'Back to exercises' }))
+
+    // Straight back to the list (Complete Workout is only on the list view);
+    // it did NOT advance into Pull-up.
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Complete Workout' })).toBeInTheDocument(),
+    )
+    expect(screen.queryByRole('heading', { name: 'Pull-up' })).not.toBeInTheDocument()
+  })
+
+  it("'← Exercises' does NOT mark the exercise complete", async () => {
+    const user = userEvent.setup()
+    await setAfterExercise('next', db)
+    const { session, exercises } = await startSession('A', db)
+    const deadlift = exercises.find((e) => e.exerciseNameSnapshot === 'Deadlift')!
+    renderAt(session.id)
+
+    await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
+    await user.click(screen.getByText('Deadlift'))
+    await waitFor(() => expect(screen.getByText('Set 1')).toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: 'Back to exercises' }))
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Complete Workout' })).toBeInTheDocument(),
+    )
+
+    // The exercise remains not-completed (only "Done with Exercise" completes it).
+    const stored = await db.workoutExercises.get(deadlift.id)
+    expect(stored?.completed).toBe(false)
+  })
+
+  it("'← Exercises' records nothing when no set was saved", async () => {
+    const user = userEvent.setup()
+    const { session, exercises } = await startSession('A', db)
+    const deadlift = exercises.find((e) => e.exerciseNameSnapshot === 'Deadlift')!
+    renderAt(session.id)
+
+    await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
+    await user.click(screen.getByText('Deadlift'))
+    await waitFor(() => expect(screen.getByText('Set 1')).toBeInTheDocument())
+    // Leave without saving a set.
+    await user.click(screen.getByRole('button', { name: 'Back to exercises' }))
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Complete Workout' })).toBeInTheDocument(),
+    )
+
+    // No sets were recorded for the exercise.
+    const count = await db.exerciseSets.where('workoutExerciseId').equals(deadlift.id).count()
+    expect(count).toBe(0)
+  })
 })

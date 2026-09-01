@@ -390,6 +390,23 @@ date — a day ahead of local time on evenings in timezones behind UTC. Fixed:
 - [x] `dates.test.ts` — local date for an instant; agrees with `toDateISO`; a
       workout started now is labelled today's local date. **87 tests passing.**
 
+### Phase 7.4 — Separate "← Exercises" from "Done with Exercise" (user report, 2026-08-31)  ✅
+
+In "advance to next exercise" mode, the `← Exercises` back button shared the
+`onDone` handler, so it (a) cycled through every remaining exercise before
+reaching the list and (b) marked each one complete without the user clicking
+"Done with Exercise". Fixed:
+
+- [x] `FocusedExercise` now takes a distinct `onBack` (separate from `onDone`).
+- [x] `← Exercises` → `onBack` → returns straight to the list; no cycling, no
+      completion, nothing recorded. `Done with Exercise` → `onDone` → marks
+      complete then advances/returns per setting (unchanged).
+- [x] Saving a set still records it immediately ("Save set N" is the record
+      action); leaving without saving records nothing — unchanged and correct.
+- [x] Tests (`afterExercise.test.tsx`): back returns to list without cycling in
+      'next' mode; back does not mark complete; back records nothing when no set
+      saved. **90 tests passing.**
+
 ---
 
 ## Phase 8 — Dashboard / Today (PRD §4)

@@ -66,6 +66,7 @@ export function WorkoutScreen() {
             setFocusIndex(null)
           }
         }}
+        onBack={() => setFocusIndex(null)}
       />
     )
   }
