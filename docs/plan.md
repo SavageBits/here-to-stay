@@ -122,22 +122,54 @@ workout builder).
 
 ---
 
-## Phase 3 — Persistence Layer
+## Phase 3 — Persistence Layer  ✅ COMPLETE (2026-08-31)
 
-- [ ] Define Dexie DB + v1 schema in `data/db.ts` (tables & indexes per
-      architecture §5.1), including unique index on `weightEntries.date`.
-- [ ] Document the migration/versioning pattern with a placeholder v2 upgrade.
-- [ ] `data/seed.ts`: create Workout A & B templates with default exercises on
-      first run.
-- [ ] `weightRepo`: upsert-by-date, edit, delete, list-in-range.
-- [ ] `exerciseRepo`: create/rename/archive logical exercises (stable IDs).
-- [ ] `templateRepo`: add / rename / archive / reorder template exercises.
-- [ ] `sessionRepo`: start (via `workoutBuilder`), add/edit/delete sets,
-      `completeSession` (runs progression, writes snapshots + `nextTargetWeight`,
-      updates template target), reopen/edit, `recomputeSession` (idempotent).
-- [ ] `backupRepo`: export JSON + CSV, import JSON.
-- [ ] **Tests:** one-weigh-in-per-day constraint; complete→reopen→save
-      idempotency; snapshots survive a rename.
+**49 tests passing total (37 domain + 12 repository). Typecheck, lint, and
+production build all clean.**
+
+- [x] Define Dexie DB + v1 schema in `data/db.ts` (tables & indexes per
+      architecture §5.1), including the `&date` unique index on `weightEntries`.
+      Constructor accepts `DexieOptions` so tests can inject fake-indexeddb.
+- [x] Document the migration/versioning pattern with a commented placeholder v2
+      upgrade in `db.ts`.
+- [x] `data/seed.ts`: `seedIfEmpty` creates Workout A & B templates with default
+      exercises on first run; idempotent (no-op if already seeded).
+- [x] `weightRepo`: `upsertWeight` (one-per-day), update, delete, list-in-range,
+      list-all, latest, recent-window.
+- [x] `exerciseRepo`: create / rename / archive logical exercises (stable IDs);
+      list active.
+- [x] `templateRepo`: get template, add / remove / reorder exercises,
+      `setTemplateTargetWeight`, and `getTemplateExerciseViews` (the exact shape
+      `buildSessionFromPrevious` consumes; skips archived).
+- [x] `sessionRepo`: `startSession` (via `workoutBuilder` + previous results),
+      load, add/update/delete sets (with set-number re-packing),
+      `setExerciseCompleted`, `completeSession` (stamps + recomputes),
+      `recomputeSession` (idempotent — derives results, updates template target),
+      `reopenSession`, list-completed, get-active.
+- [x] `backupRepo`: export JSON (full fidelity) + CSV (weigh-ins), import JSON
+      (clear-then-bulk-add), version guard.
+- [x] **Tests** — 12 repository tests via `data/testDb.ts` (isolated
+      fake-indexeddb per test): one-weigh-in-per-day upsert/replace + decimals +
+      delete; seed idempotency; first-session template targets + default set;
+      success → next session target +5; **complete→recompute→re-complete does not
+      double-increment**; edit-to-failure retains (never lowers) target;
+      **rename does not rewrite historical snapshots**; set target weight; backup
+      round-trip restores identical data; unsupported version rejected.
+
+**Bug caught by tests (fixed):** `recomputeSession` read `workoutSessions` and
+`workoutTemplates` inside its transaction but hadn't declared `workoutSessions`
+in the transaction scope → Dexie `NotFoundError`. Fixed by adding it to the
+transaction table list. This is exactly why the persistence layer is tested.
+
+**Notes:**
+- Added `fake-indexeddb` (dev dep) so Dexie runs headless under Vitest.
+- Multi-table transactions (>4 tables) use the array form
+  `db.transaction('rw', [tables], fn)` — Dexie's varargs overload is typed only
+  up to a fixed arity.
+- Bundle size is unchanged from Phase 0 because no UI imports `data/` yet
+  (tree-shaking); it wires up in Phase 4.
+
+**Next:** Phase 4 — app shell, routing, provider wiring, and first-run seed.
 
 ---
 
