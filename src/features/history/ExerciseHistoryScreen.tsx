@@ -5,6 +5,7 @@
  */
 
 import { useNavigate, useParams } from 'react-router-dom'
+import { timestampToLocalDate } from '../../lib/dates'
 import { fmtWeight } from '../weight/format'
 import { useExerciseHistory } from './useHistory'
 
@@ -26,7 +27,9 @@ export function ExerciseHistoryScreen() {
       {entries.map(({ workoutExercise: we, sets, session }) => (
         <div key={we.id} className="card">
           <div className="detail-exercise__head">
-            <h2 className="detail-exercise__name">{session.completedAt?.slice(0, 10)}</h2>
+            <h2 className="detail-exercise__name">
+              {session.completedAt ? timestampToLocalDate(session.completedAt) : ''}
+            </h2>
             <span className="muted">Workout {session.workoutType}</span>
           </div>
 

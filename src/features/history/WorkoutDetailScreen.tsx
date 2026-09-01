@@ -7,6 +7,7 @@
 
 import { useNavigate, useParams } from 'react-router-dom'
 import { reopenSession } from '../../data/repositories/sessionRepo'
+import { timestampToLocalDate } from '../../lib/dates'
 import { fmtWeight } from '../weight/format'
 import { useSessionDetail } from './useHistory'
 
@@ -34,7 +35,7 @@ export function WorkoutDetailScreen() {
   }
 
   const { session, exercises } = detail
-  const dateLabel = session.completedAt?.slice(0, 10) ?? session.startedAt.slice(0, 10)
+  const dateLabel = timestampToLocalDate(session.completedAt ?? session.startedAt)
 
   return (
     <section className="screen">

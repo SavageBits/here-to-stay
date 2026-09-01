@@ -4,6 +4,7 @@
  */
 
 import { Link } from 'react-router-dom'
+import { timestampToLocalDate } from '../../lib/dates'
 import { useWorkoutHistory } from './useHistory'
 
 export function HistoryScreen() {
@@ -28,7 +29,9 @@ export function HistoryScreen() {
                   {exerciseCount} {exerciseCount === 1 ? 'exercise' : 'exercises'} completed
                 </span>
               </span>
-              <span className="history-row__date">{session.completedAt?.slice(0, 10)}</span>
+              <span className="history-row__date">
+                {session.completedAt ? timestampToLocalDate(session.completedAt) : ''}
+              </span>
             </Link>
           </li>
         ))}

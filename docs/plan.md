@@ -377,6 +377,19 @@ the ability to abandon one (PRD §17 — "Workout abandoned before completion"):
       singleton; repo tests use isolated dbs and are unaffected). Verified stable
       across repeated full-suite runs. **84 tests passing.**
 
+### Phase 7.3 — Fix workout date showing tomorrow (user report, 2026-08-31)  ✅
+
+Workout/history screens displayed `timestamp.slice(0, 10)`, which is the **UTC**
+date — a day ahead of local time on evenings in timezones behind UTC. Fixed:
+
+- [x] Added `timestampToLocalDate(ts)` in `lib/dates.ts` (formats an ISO
+      timestamp as the user's local `YYYY-MM-DD`).
+- [x] Replaced all five `.slice(0, 10)` display usages (WorkoutScreen,
+      StartWorkoutScreen, WorkoutDetailScreen, HistoryScreen,
+      ExerciseHistoryScreen) with it.
+- [x] `dates.test.ts` — local date for an instant; agrees with `toDateISO`; a
+      workout started now is labelled today's local date. **87 tests passing.**
+
 ---
 
 ## Phase 8 — Dashboard / Today (PRD §4)

@@ -12,6 +12,7 @@ import type { WorkoutType } from '../../domain/types'
 import { buildSessionFromPrevious } from '../../domain/workoutBuilder'
 import { getTemplateExerciseViews } from '../../data/repositories/templateRepo'
 import { startSession } from '../../data/repositories/sessionRepo'
+import { timestampToLocalDate } from '../../lib/dates'
 import { fmtWeight } from '../weight/format'
 
 function isWorkoutType(v: string | undefined): v is WorkoutType {
@@ -67,7 +68,7 @@ export function StartWorkoutScreen() {
         <>
           <p className="muted">
             {preview.basedOn
-              ? `Based on your last Workout ${workoutType} (${preview.basedOn.slice(0, 10)})`
+              ? `Based on your last Workout ${workoutType} (${timestampToLocalDate(preview.basedOn)})`
               : `First Workout ${workoutType} — using your template`}
           </p>
 

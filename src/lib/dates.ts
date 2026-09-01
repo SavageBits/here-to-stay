@@ -46,3 +46,12 @@ export function isWithinRange(date: DateISO, start: DateISO, end: DateISO): bool
 export function nowTimestamp(now: Date = new Date()): Timestamp {
   return now.toISOString()
 }
+
+/**
+ * Format an ISO-8601 timestamp as the user's LOCAL calendar date (`YYYY-MM-DD`).
+ * Use this for display instead of `timestamp.slice(0, 10)`, which returns the
+ * UTC date and can be off by a day in local time (e.g. evenings in the Americas).
+ */
+export function timestampToLocalDate(timestamp: Timestamp): DateISO {
+  return toDateISO(new Date(timestamp))
+}

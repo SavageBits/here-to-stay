@@ -17,6 +17,7 @@ import {
   setExerciseCompleted,
   updateSet,
 } from '../../data/repositories/sessionRepo'
+import { timestampToLocalDate } from '../../lib/dates'
 import { fmtWeight } from '../weight/format'
 import { useSession, type LoadedSessionView } from './useSession'
 import { FocusedExercise } from './FocusedExercise'
@@ -83,7 +84,7 @@ export function WorkoutScreen() {
     navigate('/', { replace: true })
   }
 
-  const dateLabel = view.session.startedAt.slice(0, 10)
+  const dateLabel = timestampToLocalDate(view.session.startedAt)
 
   return (
     <section className="screen">
