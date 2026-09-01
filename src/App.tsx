@@ -21,6 +21,10 @@ import { SettingsScreen } from './features/settings/SettingsScreen'
 
 const queryClient = new QueryClient()
 
+// Vite's base URL ('/' locally, '/here-to-stay/' on GitHub Pages). React Router
+// wants a basename without a trailing slash (except the root '/').
+const ROUTER_BASENAME = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
+
 export default function App() {
   const seeded = useSeed()
 
@@ -34,7 +38,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename={ROUTER_BASENAME}>
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<DashboardScreen />} />
