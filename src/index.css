@@ -226,3 +226,179 @@ h1 {
   gap: 0.75rem;
   justify-content: flex-end;
 }
+
+/* ---- Weight feature ---- */
+.card__title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.section-title {
+  font-size: 1rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.weight-summary__main {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.weight-summary__avg {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.weight-summary__unit {
+  color: var(--muted);
+}
+
+.weight-summary__trend {
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.weight-summary__link {
+  margin-top: 0.85rem;
+}
+
+.trend--down {
+  color: var(--success);
+}
+
+.trend--up {
+  color: var(--danger);
+}
+
+.trend--flat {
+  color: var(--muted);
+}
+
+.weight-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.weight-form input[type='date'] {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 1.1rem;
+  padding: 0.75rem 0;
+  width: 100%;
+}
+
+.weight-form input[type='date']:focus {
+  outline: none;
+}
+
+.weight-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.weight-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.weight-row__date {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.weight-row__weight {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.weight-row__actions,
+.weight-row__edit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.weight-row__actions .btn,
+.weight-row__edit .btn {
+  padding: 0.4rem 0.7rem;
+  min-height: 40px;
+  font-size: 0.85rem;
+}
+
+/* ---- Dashboard ---- */
+.dashboard__today {
+  margin: 0 0 0.75rem;
+}
+
+.dashboard__stats {
+  display: flex;
+  gap: 2rem;
+  margin: 0.5rem 0;
+}
+
+.stat__value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat__label {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.dashboard__actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.dashboard__actions .btn {
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* ---- Trend chart ---- */
+.range-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.range-tab {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.range-tab--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.chart-card {
+  padding: 0.75rem 0.5rem;
+}
+
+/* Links styled as buttons need explicit centering. */
+a.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import App from './App'
 
@@ -11,10 +11,10 @@ describe('App shell', () => {
     render(<App />)
     // Loading gate shows first, then resolves to the dashboard.
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Today' })).toBeInTheDocument())
-    // Bottom nav is present with the primary destinations.
+    // Bottom nav is present with the primary destinations. Scope queries to the
+    // nav since some labels (e.g. "Weight") also appear in dashboard content.
     const nav = screen.getByRole('navigation', { name: 'Primary' })
-    expect(nav).toBeInTheDocument()
-    expect(screen.getByText('Weight')).toBeInTheDocument()
-    expect(screen.getByText('Workouts')).toBeInTheDocument()
+    expect(within(nav).getByText('Weight')).toBeInTheDocument()
+    expect(within(nav).getByText('Workouts')).toBeInTheDocument()
   })
 })

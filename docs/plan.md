@@ -208,16 +208,40 @@ trend chart).
 
 ---
 
-## Phase 5 — Weight Tracking Feature (PRD §5)
+## Phase 5 — Weight Tracking Feature (PRD §5)  ✅ COMPLETE (2026-08-31)
 
-- [ ] Log Weight screen: default date = today, decimals, pounds, remembers last
-      value as a hint but never auto-saves.
-- [ ] Weigh-in list: add for another date, edit, delete (with confirm).
-- [ ] Trend chart (Recharts): daily points + prominent 7-day average line.
-- [ ] Range selector: 30d / 90d / 6m / 1y / All.
-- [ ] Show current 7-day average, delta vs 7 days ago, direction label + raw number.
-- [ ] **Acceptance (PRD §18 weight):** record in seconds, edit/delete, chart,
-      rolling average, up/down vs 7 days ago, no false zeros.
+**53 tests passing (adds 3 weight-flow tests). Typecheck, lint, build clean.**
+
+- [x] Log Weight screen: default date = today (capped at today), decimals,
+      pounds; most recent weight shown as an input *placeholder hint* only —
+      never auto-saved (PRD §5.1).
+- [x] Weigh-in list: log for any date via the date picker, edit inline, delete
+      with a confirm dialog. Backed by `upsertWeight` (one-per-day).
+- [x] Trend chart (Recharts): faint daily points + prominent 3px 7-day average
+      line (PRD §5.3).
+- [x] Range selector: 30d / 90d / 6m / 1y / All (tabs).
+- [x] Show current 7-day average, delta vs 7 days ago, and the direction label
+      (Trending down/Roughly flat/Trending up) with the raw ± number kept visible.
+- [x] Reactive data via Dexie `useLiveQuery` hooks (`useAllWeights`,
+      `useWeightSummary`) — list, summary, chart, and dashboard all update live.
+- [x] Dashboard weight section wired up (today's weigh-in, most recent, 7-day
+      avg + trend, Log Weight / View Trend actions) so there's real data to see.
+- [x] **Acceptance (PRD §18 weight):** record in a few seconds ✓, edit/delete ✓,
+      chart with daily + average ✓, rolling 7-day average ✓, higher/lower vs 7
+      days ago ✓, missing days never create false zeros (domain-tested Phase 2) ✓.
+
+**Tests added (`WeightScreen.test.tsx`):** record today's weight → appears in
+list; edit an entry; delete after confirmation. Also tightened the Phase 4
+App-shell test to scope nav queries (the dashboard now renders a "Weight" card
+title too).
+
+**Deps:** added `@testing-library/user-event` (dev) for interaction tests.
+
+**Note:** production bundle ~755 KB precache (Recharts is large). Acceptable for
+a local PWA; can be code-split later if desired (Vite suggested it — deferred as
+a non-blocking optimization).
+
+**Next:** Phase 6 — Workout Templates (add/rename/remove/reorder exercises).
 
 ---
 
