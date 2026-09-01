@@ -109,6 +109,38 @@ h1 {
   font-size: 1.25rem;
 }
 
+/* ---- Update prompt ---- */
+.update-prompt {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  padding-top: calc(0.75rem + env(safe-area-inset-top));
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.update-prompt__text {
+  font-weight: 600;
+}
+
+.update-prompt__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.update-prompt__btn {
+  padding: 0.5rem 0.9rem;
+  min-height: 40px;
+  font-size: 0.9rem;
+}
+
 /* ---- Buttons ---- */
 .btn {
   appearance: none;

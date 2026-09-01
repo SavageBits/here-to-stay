@@ -570,6 +570,20 @@ eviction of non-installed sites, storage pressure, private mode, new device).
       BackupCard never→export→"today" + stamps `lastBackupAt`. Documented the
       full risk + mitigations in architecture §7. **105 tests passing.**
 
+### Phase 10.3 — Explicit update prompt (user request, 2026-09-01)  ✅
+
+Replaced silent `autoUpdate` with an on-demand "new version available — reload"
+banner so deploys never swap the app mid-session.
+
+- [x] PWA `registerType` → `'prompt'`; `src/vite-env.d.ts` references
+      `vite-plugin-pwa/react` virtual-module types.
+- [x] `components/UpdatePrompt.tsx` uses `useRegisterSW` — shows a fixed top
+      banner with Reload (`updateServiceWorker(true)`) / Later when a new SW is
+      waiting. Rendered at the app root.
+- [x] Tests: `UpdatePrompt.test.tsx` (3 — hidden when no update; Reload activates
+      + reloads; Later dismisses) via a mocked virtual module. Build verified in
+      prompt mode. **108 tests passing.**
+
 ---
 
 ## Phase 11 — Hardening & Edge Cases (PRD §17)

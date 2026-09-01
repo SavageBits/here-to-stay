@@ -14,7 +14,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt' surfaces a "new version available — reload" UI instead of
+      // swapping silently, so updates never change the app mid-session.
+      registerType: 'prompt',
       includeAssets: ['favicon-48.png', 'apple-touch-icon.png', 'icon.svg'],
       manifest: {
         name: 'Health Goals Tracker',

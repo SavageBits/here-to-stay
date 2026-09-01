@@ -7,6 +7,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
+import { UpdatePrompt } from './components/UpdatePrompt'
 import { useSeed } from './hooks/useSeed'
 import { DashboardScreen } from './features/dashboard/DashboardScreen'
 import { WeightScreen } from './features/weight/WeightScreen'
@@ -38,6 +39,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <UpdatePrompt />
       <BrowserRouter basename={ROUTER_BASENAME}>
         <Routes>
           <Route element={<Layout />}>
