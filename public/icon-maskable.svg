@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Health Goals Tracker">
+  <!-- Full-bleed background for maskable safe zone -->
+  <rect width="512" height="512" fill="#111827"/>
+  <!-- Content scaled into the ~80% safe zone (centered) -->
+  <g transform="translate(256 256) scale(0.62) translate(-256 -256)">
+    <polyline points="96,340 192,300 288,236 416,150"
+      fill="none" stroke="#3b82f6" stroke-width="24"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="96" cy="340" r="16" fill="#3b82f6"/>
+    <circle cx="192" cy="300" r="16" fill="#3b82f6"/>
+    <circle cx="288" cy="236" r="16" fill="#3b82f6"/>
+    <circle cx="416" cy="150" r="18" fill="#22c55e"/>
+    <g fill="#f9fafb">
+      <rect x="150" y="392" width="212" height="20" rx="10"/>
+      <rect x="130" y="372" width="26" height="60" rx="8"/>
+      <rect x="356" y="372" width="26" height="60" rx="8"/>
+      <rect x="112" y="384" width="20" height="36" rx="6"/>
+      <rect x="380" y="384" width="20" height="36" rx="6"/>
+    </g>
+  </g>
+</svg>

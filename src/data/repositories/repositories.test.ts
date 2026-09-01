@@ -201,7 +201,27 @@ describe('backupRepo — round-trip (PRD §19)', () => {
   })
 
   it('rejects an unsupported backup version', async () => {
-    const bad = { ...(await exportBackup(db)), version: 2 as unknown as 1 }
+    const bad = { ...(await exportBackup(db)), version: 99 as unknown as 1 }
     await expect(importBackup(bad, db)).rejects.toThrow()
+  })
+
+  it('exports version 2 including settings', async () => {
+    await seedIfEmpty(db)
+    const backup = await exportBackup(db)
+    expect(backup.version).toBe(2)
+    expect(Array.isArray(backup.settings)).toBe(true)
+  })
+
+  it('imports a legacy v1 backup (no settings field)', async () => {
+    await seedIfEmpty(db)
+    await upsertWeight('2026-02-01', 170.2, db)
+    const v2 = await exportBackup(db)
+    // Simulate an older backup: v1 shape without a settings array.
+    const { settings: _omit, ...rest } = v2
+    const legacy = { ...rest, version: 1 as const }
+
+    const db2 = await makeTestDb()
+    await importBackup(legacy, db2)
+    expect((await getWeightByDate('2026-02-01', db2))?.weight).toBe(170.2)
   })
 })

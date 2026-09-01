@@ -1,11 +1,11 @@
 /**
- * Settings (PRD §19). Workout logging preference now; backup/export/import land
- * in Phase 10.
+ * Settings (PRD §19): workout logging preference and backup/export/import.
  */
 
 import type { AfterExerciseBehavior } from '../../domain/entities'
 import { setAfterExercise } from '../../data/repositories/settingsRepo'
 import { useSettings } from '../../hooks/useSettings'
+import { BackupCard } from './BackupCard'
 
 const AFTER_OPTIONS: Array<{ value: AfterExerciseBehavior; label: string; hint: string }> = [
   {
@@ -52,10 +52,7 @@ export function SettingsScreen() {
         </div>
       </div>
 
-      <div className="card">
-        <h2 className="card__title">Backup &amp; data</h2>
-        <p className="muted">Export / import coming in Phase 10.</p>
-      </div>
+      <BackupCard />
     </section>
   )
 }

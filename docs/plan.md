@@ -506,11 +506,38 @@ cleanup:
 
 ---
 
-## Phase 10 — Settings, Backup & PWA (PRD §19)
+## Phase 10 — Settings, Backup & PWA (PRD §19)  ✅ COMPLETE (2026-08-31)
 
-- [ ] Settings screen: unit display, export JSON, export CSV, import JSON.
-- [ ] Configure `vite-plugin-pwa` (manifest, icons, offline app shell).
-- [ ] Verify install-to-home-screen and offline use on a phone/emulator.
+**99 tests passing (adds 12: CSV export, v1/v2 backup, BackupCard UI). Typecheck,
+lint, build clean. Production build verified: manifest + SW + all icons serve 200.**
+
+- [x] Settings screen: full **Backup & data** card (`BackupCard`) with Export
+      JSON (full backup), Export CSV (weigh-ins **and** workout sets), and Import
+      JSON (file picker → confirm "replace all data" → restore, with success/error
+      status). Units intentionally **lb-only for MVP** (no kg toggle).
+- [x] `exportWorkoutSetsCsv`: one row per set of completed workouts
+      (date, workout, exercise, set, weight, reps, target, achieved), CSV-escaped.
+- [x] Backup format bumped to **v2** (now includes the `settings` table); import
+      accepts v1 (legacy, no settings) and v2; unknown versions rejected.
+- [x] `lib/download.ts`: DOM download / file-read helpers (keeps repos DOM-free).
+- [x] Configured `vite-plugin-pwa`: real app icons (192, 512, maskable-512, SVG,
+      apple-touch-180, favicon-48 — generated from `public/icon.svg` via `sips`),
+      manifest (name, standalone, portrait, theme color, all icon sizes),
+      `includeAssets`, offline app-shell precache. `index.html` updated with
+      favicon/apple-touch links + theme-color + proper title; removed stale
+      scaffold icons.
+- [x] Verified on the production build (`vite preview`): `/`, `manifest.webmanifest`,
+      `sw.js`, and all icon files return 200; manifest contents correct. Genuinely
+      installable + offline-capable. **On-device install-to-home-screen is the
+      user's final check (Phase 12).**
+- [x] Tests: `csvExport.test.ts` (weigh-in + workout-set CSV, quoting, excludes
+      in-progress); backup v1/v2 round-trip + settings in `repositories.test.ts`;
+      `BackupCard.test.tsx` (export success, import-replaces-data, invalid-JSON
+      rejected). Fixed a stale TemplatesScreen assertion (removed exercise now
+      correctly appears in the re-add picker).
+
+**Note:** bundle ~801 KB (231 KB gzip), Recharts-dominated — acceptable for a
+local PWA; code-splitting remains a deferred, non-blocking optimization.
 
 ---
 

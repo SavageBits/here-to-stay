@@ -64,7 +64,11 @@ describe('TemplatesScreen', () => {
     const dialog = screen.getByRole('alertdialog')
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }))
 
-    await waitFor(() => expect(screen.queryByText('Plank')).not.toBeInTheDocument())
+    // Gone from the template's exercise list (it may now appear under
+    // "Add existing exercise" — that's expected, so assert on the row control).
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Rename Plank' })).not.toBeInTheDocument(),
+    )
   })
 
   it('reorders exercises with the move-down control', async () => {

@@ -818,6 +818,51 @@ a.btn {
   font-size: 0.85rem;
 }
 
+/* ---- Backup card ---- */
+.backup__hint {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+}
+
+.backup__group {
+  margin-bottom: 1rem;
+}
+
+.backup__group:last-of-type {
+  margin-bottom: 0;
+}
+
+.backup__row {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+}
+
+.backup__row .btn {
+  flex: 1;
+}
+
+.backup__file {
+  display: none;
+}
+
+.backup__status {
+  margin: 1rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+.backup__status--ok {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.backup__status--error {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
 /* ---- History ---- */
 .history-list {
   list-style: none;
