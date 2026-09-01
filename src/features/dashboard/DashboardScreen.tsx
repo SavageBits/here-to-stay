@@ -8,9 +8,11 @@ import { Link } from 'react-router-dom'
 import { today } from '../../lib/dates'
 import { useWeightSummary } from '../weight/useWeights'
 import { DIRECTION_ICON, DIRECTION_LABEL, fmtDelta, fmtWeight } from '../weight/format'
+import { useNextWorkout } from '../workout/useNextWorkout'
 
 export function DashboardScreen() {
   const summary = useWeightSummary()
+  const next = useNextWorkout()
 
   return (
     <section className="screen">
@@ -57,7 +59,38 @@ export function DashboardScreen() {
 
       <div className="card">
         <h2 className="card__title">Next workout</h2>
-        <p className="muted">Workout suggestions and start actions come in Phase 8.</p>
+        {next?.active ? (
+          <>
+            <p className="dashboard__today">You have a workout in progress.</p>
+            <div className="dashboard__actions">
+              <Link to={`/workout/${next.active.id}`} className="btn btn--primary">
+                Resume Workout {next.active.workoutType}
+              </Link>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="muted">
+              {next?.lastCompleted
+                ? `Last completed: Workout ${next.lastCompleted.workoutType}. Suggested next: Workout ${next.suggested}.`
+                : 'No workout history yet. Suggested: Workout A.'}
+            </p>
+            <div className="dashboard__actions">
+              <Link
+                to={`/workout/start/${next?.suggested ?? 'A'}`}
+                className="btn btn--primary"
+              >
+                Start Workout {next?.suggested ?? 'A'}
+              </Link>
+              <Link
+                to={`/workout/start/${next?.suggested === 'A' ? 'B' : 'A'}`}
+                className="btn btn--ghost"
+              >
+                Start {next?.suggested === 'A' ? 'B' : 'A'} instead
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </section>
   )

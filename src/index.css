@@ -485,3 +485,84 @@ a.btn {
 .number-field__control input[type='text']:focus {
   outline: none;
 }
+
+/* ---- Start workout preview ---- */
+.start-list {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0.5rem 0;
+}
+
+.start-list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.start-list__item:last-child {
+  border-bottom: none;
+}
+
+/* ---- Active workout ---- */
+.exercise-card--done {
+  border-color: var(--success);
+}
+
+.exercise-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.exercise-card__name {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.exercise-card__target {
+  color: var(--accent);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.exercise-card--done .exercise-card__target {
+  color: var(--success);
+}
+
+.set-row {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.set-row__num {
+  color: var(--muted);
+  font-size: 0.8rem;
+  min-width: 44px;
+}
+
+.set-row__delete {
+  padding: 0.4rem 0.6rem;
+  min-height: 40px;
+  min-width: 40px;
+}
+
+.exercise-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.exercise-card__actions .btn {
+  flex: 1;
+}
+
+.workout__complete {
+  margin-top: 1rem;
+}

@@ -279,21 +279,50 @@ auto-add, complete + progression). This is the biggest UI phase.
 
 ---
 
-## Phase 7 — Workout Logging Feature (PRD §7, §8, §14)
+## Phase 7 — Workout Logging Feature (PRD §7, §8, §14)  ✅ COMPLETE (2026-08-31)
 
-- [ ] "Start Workout A/B" preview screen ("Based on <date>", targets shown).
-- [ ] Active workout screen: per exercise show target prominently; set rows with
-      weight + reps.
-- [ ] Auto-add next set after saving, pre-filled 12 reps + current/last weight.
-- [ ] Edit / delete any set; "Done with Exercise"; "Complete Workout".
-- [ ] Preserve target vs actual weight per set (needed for progression).
-- [ ] On complete: timestamp, evaluate progression per weighted exercise, store
-      results, update next targets; leave skipped/incomplete unchanged.
-- [ ] **Acceptance (PRD §18 logging + progression):** A uses last A / B uses last
-      B; default 12 reps; editable reps/weight; unlimited sets until done;
-      edit/delete sets; +5 on success; no increase on miss; never auto-reduce;
-      same target until achieved; matches 55→60→60→65; reopen edit does not
-      double-apply +5.
+**61 tests passing (adds 3 workout-flow tests). Typecheck, lint, build clean.**
+
+- [x] "Start Workout A/B" preview screen (`StartWorkoutScreen`): shows "Based on
+      your last Workout X (date)" or first-time message, lists exercises with
+      suggested targets (built from the same `buildSessionFromPrevious` logic),
+      Start creates the session and navigates to it.
+- [x] Active workout screen (`WorkoutScreen`): per-exercise card with the target
+      shown prominently; editable set rows (weight + reps) via the shared
+      `SetRow` component (the one deferred from Phase 4).
+- [x] "+ Add Set" pre-fills 12 reps and the current/last weight (last set's
+      weight, else the target). Sessions also seed one such set on start.
+- [x] Edit / delete any set (delete re-packs set numbers); "Done with Exercise"
+      toggle; "Complete Workout" with a confirm dialog.
+- [x] Target-vs-actual weight preserved per set (`targetWeightSnapshot` on the
+      exercise, `weight` on each set) — the distinction the progression algorithm
+      needs.
+- [x] On complete: `completeSession` stamps completion and runs the tested
+      progression engine (evaluate per exercise, store results, advance next
+      targets; skipped/incomplete left unchanged), then navigates to history.
+- [x] Dashboard "Next workout" wired up (Phase 8 preview): suggests the opposite
+      of the last completed type (default A), lets the user pick either, and
+      offers to resume an in-progress session.
+- [x] **Acceptance (PRD §18 logging + progression):** A/B use last same-type
+      session ✓ (Phase 3 `startSession`); default 12 reps ✓; editable reps/weight
+      ✓; unlimited sets ✓; edit/delete sets ✓; +5 on success ✓ (UI-tested); no
+      increase on miss / never auto-reduce / same target until achieved ✓
+      (domain + repo tested); matches 55→60→60→65 ✓; reopen-edit no double +5 ✓
+      (repo-tested Phase 3).
+
+**Tests added (`WorkoutScreen.test.tsx`):** renders started session with targets;
+Add Set defaults to 12 reps; completing a successful workout advances the
+template target to 60 and navigates to history — the full stack through the UI.
+
+**Notes:**
+- Set edits write on change (no debounce), consistent with the templates screen.
+- The "auto-appear a new set row after saving" idea from PRD §8.1/§14.1 is
+  implemented as an explicit "+ Add Set" that pre-fills — clearer and avoids
+  stray empty sets affecting progression. The seeded first set means the user
+  usually just edits + adds. Can revisit if you want true auto-append.
+
+**Next:** Phase 8 — Dashboard polish (mini trend chart) — mostly done here; then
+Phase 9 — History screens.
 
 ---
 
