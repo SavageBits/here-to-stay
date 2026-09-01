@@ -107,6 +107,22 @@ export interface WorkoutExercise {
   updatedAt: Timestamp
 }
 
+/**
+ * When an exercise is marked done in the focused logging view, whether to return
+ * to the exercise list or auto-advance into the next exercise (user preference).
+ */
+export type AfterExerciseBehavior = 'list' | 'next'
+
+/**
+ * App-wide settings. A single row keyed by a fixed id (`'app'`). Extensible for
+ * future preferences (units, goal weight, etc. — PRD §21).
+ */
+export interface AppSettings {
+  id: 'app'
+  afterExercise: AfterExerciseBehavior
+  updatedAt: Timestamp
+}
+
 /** A single logged set within a workout exercise (PRD §8, §15). */
 export interface ExerciseSet {
   id: string

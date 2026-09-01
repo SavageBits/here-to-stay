@@ -505,64 +505,259 @@ a.btn {
   border-bottom: none;
 }
 
-/* ---- Active workout ---- */
-.exercise-card--done {
+/* ---- Workout: exercise list (nav) ---- */
+.exercise-nav {
+  list-style: none;
+  margin: 0.5rem 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.exercise-nav__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  min-height: 64px;
+}
+
+.exercise-nav__item--done {
   border-color: var(--success);
 }
 
-.exercise-card__head {
+.exercise-nav__main {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-.exercise-card__name {
-  margin: 0;
+.exercise-nav__name {
   font-size: 1.1rem;
-}
-
-.exercise-card__target {
-  color: var(--accent);
   font-weight: 700;
-  white-space: nowrap;
 }
 
-.exercise-card--done .exercise-card__target {
-  color: var(--success);
-}
-
-.set-row {
-  display: grid;
-  grid-template-columns: auto 1fr 1fr auto;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.set-row__num {
+.exercise-nav__meta {
   color: var(--muted);
-  font-size: 0.8rem;
-  min-width: 44px;
+  font-size: 0.85rem;
 }
 
-.set-row__delete {
-  padding: 0.4rem 0.6rem;
-  min-height: 40px;
-  min-width: 40px;
+.exercise-nav__chev {
+  font-size: 1.5rem;
+  color: var(--muted);
 }
 
-.exercise-card__actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-}
-
-.exercise-card__actions .btn {
-  flex: 1;
+.exercise-nav__item--done .exercise-nav__chev {
+  color: var(--success);
 }
 
 .workout__complete {
   margin-top: 1rem;
+}
+
+/* ---- Workout: focused single-exercise view ---- */
+.focus {
+  display: flex;
+  flex-direction: column;
+}
+
+.focus__back {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  padding: 0.25rem 0;
+  cursor: pointer;
+}
+
+.focus__name {
+  margin: 0.5rem 0 0.25rem;
+  font-size: 1.6rem;
+}
+
+.focus__target {
+  margin: 0 0 1.25rem;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.focus__set-indicator {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+/* Huge reps field — the star of the view. */
+.focus__reps {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.focus__reps-label {
+  color: var(--muted);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.focus__reps-input {
+  width: 100%;
+  max-width: 320px;
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 4.5rem;
+  font-weight: 800;
+  text-align: center;
+  padding: 0.5rem 0;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+
+.focus__reps-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Hide number spinners for the big reps field. */
+.focus__reps-input::-webkit-outer-spin-button,
+.focus__reps-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.focus__weight {
+  max-width: 320px;
+  width: 100%;
+  align-self: center;
+  margin-bottom: 1.25rem;
+}
+
+.focus__save {
+  max-width: 320px;
+  align-self: center;
+}
+
+.focus__done {
+  margin-top: auto;
+}
+
+/* Compact recorded-sets summary. */
+.focus__recorded {
+  margin: 1.75rem 0 1rem;
+}
+
+.focus__recorded-title {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.5rem;
+}
+
+.focus__recorded-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.focus__recorded-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem 1rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.focus__recorded-num {
+  color: var(--muted);
+}
+
+.focus__recorded-val {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.focus__recorded-edit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 0.7rem 1rem;
+}
+
+.focus__recorded-edit-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.focus__recorded-edit-actions .btn {
+  padding: 0.4rem 0.7rem;
+  min-height: 40px;
+}
+
+/* ---- Settings ---- */
+.settings-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.settings-option {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.settings-option--active {
+  border-color: var(--accent);
+}
+
+.settings-option input {
+  margin-top: 0.2rem;
+}
+
+.settings-option__label {
+  display: block;
+  font-weight: 700;
+}
+
+.settings-option__hint {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
 }

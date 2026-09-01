@@ -1,14 +1,14 @@
 /**
- * Active workout logging (PRD §8, §14.1). Each exercise shows its target
- * prominently, an editable list of sets, an "Add Set" that pre-fills 12 reps and
- * the current/last weight, and "Done with Exercise". Completing the workout runs
- * the (already-tested) progression engine via completeSession.
+ * Workout logging (redesigned). The workout is a LIST of exercises; tapping one
+ * opens a FocusedExercise view devoted to logging sets for just that exercise.
+ * "Done with Exercise" exits the focused view — either back to the list or, per
+ * the user's setting, straight into the next exercise (PRD §8, §14.1).
  */
 
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ConfirmDialog } from '../../components/ConfirmDialog'
-import { DEFAULT_REPS } from '../../domain/workoutBuilder'
+import { useSettings } from '../../hooks/useSettings'
 import {
   addSet,
   completeSession,
@@ -18,12 +18,14 @@ import {
 } from '../../data/repositories/sessionRepo'
 import { fmtWeight } from '../weight/format'
 import { useSession, type LoadedSessionView } from './useSession'
-import { SetRow } from './SetRow'
+import { FocusedExercise } from './FocusedExercise'
 
 export function WorkoutScreen() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
   const loaded = useSession(sessionId)
+  const settings = useSettings()
+  const [focusIndex, setFocusIndex] = useState<number | null>(null)
   const [confirmComplete, setConfirmComplete] = useState(false)
   const [completing, setCompleting] = useState(false)
 
@@ -39,6 +41,33 @@ export function WorkoutScreen() {
     )
   }
 
+  const view: LoadedSessionView = loaded
+
+  // ---- Focused single-exercise view ----
+  if (focusIndex !== null && view.exercises[focusIndex]) {
+    const ex = view.exercises[focusIndex]
+    return (
+      <FocusedExercise
+        exercise={ex}
+        onRecordSet={async (weight, reps) => {
+          await addSet(ex.id, { weight, reps })
+        }}
+        onEditSet={(setId, weight, reps) => updateSet(setId, { weight, reps })}
+        onDeleteSet={(setId) => deleteSet(setId)}
+        onDone={async () => {
+          await setExerciseCompleted(ex.id, true)
+          // After finishing: go to the next exercise or back to the list.
+          if (settings.afterExercise === 'next' && focusIndex + 1 < view.exercises.length) {
+            setFocusIndex(focusIndex + 1)
+          } else {
+            setFocusIndex(null)
+          }
+        }}
+      />
+    )
+  }
+
+  // ---- Exercise list view ----
   async function handleComplete() {
     if (!sessionId) return
     setCompleting(true)
@@ -46,7 +75,6 @@ export function WorkoutScreen() {
     navigate(`/history/${sessionId}`, { replace: true })
   }
 
-  const view: LoadedSessionView = loaded
   const dateLabel = view.session.startedAt.slice(0, 10)
 
   return (
@@ -54,52 +82,31 @@ export function WorkoutScreen() {
       <h1>Workout {view.session.workoutType}</h1>
       <p className="muted">{dateLabel}</p>
 
-      {view.exercises.map((ex) => {
-        // Weight to pre-fill a new set: last set's weight, else the target.
-        const lastWeight = ex.sets.length ? ex.sets[ex.sets.length - 1].weight : null
-        const prefillWeight = lastWeight ?? ex.targetWeightSnapshot
-        return (
-          <div key={ex.id} className={`card exercise-card${ex.completed ? ' exercise-card--done' : ''}`}>
-            <div className="exercise-card__head">
-              <h2 className="exercise-card__name">{ex.exerciseNameSnapshot}</h2>
-              <span className="exercise-card__target">
-                {ex.targetWeightSnapshot !== null
-                  ? `Target: ${fmtWeight(ex.targetWeightSnapshot)} lb`
-                  : 'Bodyweight'}
+      <ul className="exercise-nav">
+        {view.exercises.map((ex, i) => (
+          <li key={ex.id}>
+            <button
+              type="button"
+              className={`exercise-nav__item${ex.completed ? ' exercise-nav__item--done' : ''}`}
+              onClick={() => setFocusIndex(i)}
+            >
+              <span className="exercise-nav__main">
+                <span className="exercise-nav__name">{ex.exerciseNameSnapshot}</span>
+                <span className="exercise-nav__meta">
+                  {ex.targetWeightSnapshot !== null
+                    ? `Target ${fmtWeight(ex.targetWeightSnapshot)} lb`
+                    : 'Bodyweight'}
+                  {' · '}
+                  {ex.sets.length} {ex.sets.length === 1 ? 'set' : 'sets'}
+                </span>
               </span>
-            </div>
-
-            {ex.sets.map((s) => (
-              <SetRow
-                key={s.id}
-                setNumber={s.setNumber}
-                weight={s.weight}
-                reps={s.reps}
-                onChangeWeight={(v) => updateSet(s.id, { weight: v })}
-                onChangeReps={(v) => updateSet(s.id, { reps: v ?? 0 })}
-                onDelete={() => deleteSet(s.id)}
-              />
-            ))}
-
-            <div className="exercise-card__actions">
-              <button
-                type="button"
-                className="btn btn--ghost"
-                onClick={() => addSet(ex.id, { weight: prefillWeight, reps: DEFAULT_REPS })}
-              >
-                + Add Set
-              </button>
-              <button
-                type="button"
-                className={ex.completed ? 'btn btn--ghost' : 'btn btn--primary'}
-                onClick={() => setExerciseCompleted(ex.id, !ex.completed)}
-              >
-                {ex.completed ? 'Done ✓' : 'Done with Exercise'}
-              </button>
-            </div>
-          </div>
-        )
-      })}
+              <span className="exercise-nav__chev" aria-hidden>
+                {ex.completed ? '✓' : '›'}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
 
       <button
         type="button"

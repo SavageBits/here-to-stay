@@ -10,6 +10,7 @@
 import Dexie from 'dexie'
 import type { DexieOptions, EntityTable } from 'dexie'
 import type {
+  AppSettings,
   Exercise,
   ExerciseSet,
   WeightEntry,
@@ -29,6 +30,7 @@ export class HealthDB extends Dexie {
   workoutSessions!: EntityTable<WorkoutSession, 'id'>
   workoutExercises!: EntityTable<WorkoutExercise, 'id'>
   exerciseSets!: EntityTable<ExerciseSet, 'id'>
+  settings!: EntityTable<AppSettings, 'id'>
 
   constructor(name = 'health-goals-tracker', options?: DexieOptions) {
     super(name, options)
@@ -47,11 +49,19 @@ export class HealthDB extends Dexie {
       exerciseSets: 'id, workoutExerciseId',
     })
 
+    // ---- Version 2 -------------------------------------------------------
+    // Adds the single-row app settings table. Existing tables are unchanged, so
+    // no data backfill is needed; the default settings row is created lazily by
+    // settingsRepo on first read.
+    this.version(2).stores({
+      settings: 'id',
+    })
+
     // ---- Future migrations ----------------------------------------------
     // When the schema changes, add a new version with only the changed tables
-    // and an upgrade() to backfill. Example (do NOT enable until needed):
+    // and an upgrade() to backfill. Example:
     //
-    // this.version(2)
+    // this.version(3)
     //   .stores({ weightEntries: 'id, &date, note' })
     //   .upgrade((tx) =>
     //     tx.table('weightEntries').toCollection().modify((e) => {

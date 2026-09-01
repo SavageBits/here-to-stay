@@ -324,6 +324,32 @@ template target to 60 and navigates to history — the full stack through the UI
 **Next:** Phase 8 — Dashboard polish (mini trend chart) — mostly done here; then
 Phase 9 — History screens.
 
+### Phase 7.1 — Focused workout UX redesign (user request, 2026-08-31)  ✅
+
+Reworked the active-workout UI from a scrollable list of exercise cards to a
+**focused, one-exercise-at-a-time flow**:
+
+- [x] Workout screen is now a **list of exercises** (rows: name, target, set
+      count, done ✓). Tapping a row opens the focused view.
+- [x] `FocusedExercise` view: screen devoted to one exercise — large "Set N"
+      indicator, **huge reps field defaulted to 12** as the primary input, weight
+      secondary (pre-filled target/last). **Save records the set in place and the
+      indicator advances to Set N+1** — no appended rows, no UI shift (the exact
+      behavior requested). Recorded sets shown compactly below with tap-to-edit.
+- [x] "Done with Exercise" exits the focused view.
+- [x] **Settings toggle** (user request): after finishing an exercise, either
+      return to the exercise list (`'list'`, default) or advance into the next
+      exercise (`'next'`).
+- [x] New persistence: `AppSettings` entity + **schema v2** (`settings` table —
+      first real migration, exercising the documented pattern), `settingsRepo`,
+      `useSettings` live-query hook.
+- [x] Settings screen implements the toggle (radio options).
+- [x] Removed the obsolete `SetRow` component.
+- [x] Tests: rewrote `WorkoutScreen.test.tsx` for the focused flow (list → focus
+      → Save advances Set 1→2 in place → Done returns to list → complete advances
+      target); added `afterExercise.test.tsx` ('next' advances to the following
+      exercise). **63 tests passing.**
+
 ---
 
 ## Phase 8 — Dashboard / Today (PRD §4)
