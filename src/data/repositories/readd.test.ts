@@ -136,7 +136,7 @@ describe('remove then re-add', () => {
     expect(nextIncline?.targetWeightSnapshot).toBe(60)
   })
 
-  it('creating a NEW exercise with the same name does NOT reconnect history', async () => {
+  it('adding by the same name reuses the existing exercise (no duplicate)', async () => {
     const { session, exercises } = await startSession('A', db)
     const incline = exercises.find((e) => e.exerciseNameSnapshot === 'Dumbbell Incline Press')!
     await addSet(incline.id, { weight: 55, reps: 12 }, db)
@@ -152,8 +152,13 @@ describe('remove then re-add', () => {
       { name: 'Dumbbell Incline Press', targetWeight: 55 },
       db,
     )
-    // Distinct id → its own fresh history, separate from the original.
-    expect(created.exerciseId).not.toBe(exId)
-    expect(await db.workoutExercises.where('exerciseId').equals(created.exerciseId).count()).toBe(0)
+    // Adding by an existing name reuses the same logical exercise, so history
+    // stays unified and no duplicate is created.
+    expect(created.exerciseId).toBe(exId)
+    expect(
+      (await db.exercises.toArray()).filter(
+        (e) => e.name.trim().toLowerCase() === 'dumbbell incline press',
+      ),
+    ).toHaveLength(1)
   })
 })

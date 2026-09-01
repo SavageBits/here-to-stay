@@ -138,7 +138,14 @@ export async function addExerciseToTemplate(
     if (opts.exerciseId) {
       exercise = await db.exercises.get(opts.exerciseId)
     } else if (opts.name) {
-      exercise = await createExercise(opts.name, db)
+      // Reuse an existing non-archived exercise with the same name (case- and
+      // whitespace-insensitive) rather than creating a duplicate logical
+      // exercise — keeps one Exercise per name so history/progression stay unified.
+      const wanted = opts.name.trim().toLowerCase()
+      const match = (await db.exercises.toArray()).find(
+        (e) => e.archivedAt === null && e.name.trim().toLowerCase() === wanted,
+      )
+      exercise = match ?? (await createExercise(opts.name.trim(), db))
     }
     if (!exercise) throw new Error('addExerciseToTemplate requires a name or exerciseId')
 

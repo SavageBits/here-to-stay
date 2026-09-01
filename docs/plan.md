@@ -435,7 +435,23 @@ removal:
 - [x] Picker label updated to always show the resume target.
 - [x] Tests added: resumes at seeded target 135 (not bodyweight) when removed
       before completion; preserves an edited target (145) across remove/re-add.
-      **74 tests passing.**
+
+**Fix (user report): duplicate exercises (e.g. two "Deadlift", one bodyweight +
+one 135).** Root cause: `addExerciseToTemplate` with a `name` always created a
+NEW logical exercise, so typing an existing name made a duplicate. Prior UI/test
+flows had created such duplicates in the persisted DB. Fixed both prevention and
+cleanup:
+- [x] **Prevention:** add-by-name now reuses an existing non-archived exercise
+      with a matching name (case/whitespace-insensitive) instead of duplicating.
+- [x] **Cleanup:** `mergeDuplicateExercises` consolidates same-name exercises —
+      re-points history + template slots to a canonical exercise (prefers the one
+      with completed history, else oldest), keeps the best `lastTargetWeight`,
+      dedupes template slots, deletes the extras. Runs once on startup (in
+      `useSeed`) so existing local data self-heals on next load.
+- [x] Tests: `dedup.test.ts` (5) — add-by-name reuses; single Deadlift candidate
+      at 135; merge keeps the history-bearing exercise; history re-pointed;
+      template views stay unique. Updated the now-obsolete readd test that had
+      asserted the old duplicate-creating behavior. **79 tests passing.**
 
 ---
 
