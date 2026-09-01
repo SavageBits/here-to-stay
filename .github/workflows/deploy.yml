@@ -27,9 +27,12 @@ jobs:
       - run: npm ci
       - run: npm run test
       # Build with the repo subpath so assets/SW/router resolve under /here-to-stay/.
+      - name: Record build time
+        run: echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
       - run: npm run build
         env:
           BASE_PATH: /here-to-stay/
+          BUILD_TIME: ${{ env.BUILD_TIME }}
       # SPA fallback: serve index.html for unknown deep links on Pages.
       - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3

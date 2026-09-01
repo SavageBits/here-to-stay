@@ -584,6 +584,19 @@ banner so deploys never swap the app mid-session.
       + reloads; Later dismisses) via a mocked virtual module. Build verified in
       prompt mode. **108 tests passing.**
 
+### Phase 10.4 — Version + updated time in Settings (user request, 2026-09-01)  ✅
+
+- [x] Bumped `package.json` version 0.0.0 → **1.0.0**.
+- [x] Vite `define` injects `__APP_VERSION__` (from package.json) and
+      `__BUILD_TIME__` (ISO, `BUILD_TIME` env or `new Date()` at build);
+      declared in `src/vite-env.d.ts`.
+- [x] CI records `BUILD_TIME` at deploy so "Updated" reflects the deploy moment.
+- [x] Settings **About** card shows Version + Updated (localized via
+      `timestampToLocalDateTime`).
+- [x] `SettingsScreen.test.tsx` verifies version + formatted updated time render;
+      confirmed the version string is baked into the built bundle. **109 tests
+      passing.**
+
 ---
 
 ## Phase 11 — Hardening & Edge Cases (PRD §17)

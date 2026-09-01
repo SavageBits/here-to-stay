@@ -5,6 +5,7 @@
 import type { AfterExerciseBehavior } from '../../domain/entities'
 import { setAfterExercise } from '../../data/repositories/settingsRepo'
 import { useSettings } from '../../hooks/useSettings'
+import { timestampToLocalDateTime } from '../../lib/dates'
 import { BackupCard } from './BackupCard'
 
 const AFTER_OPTIONS: Array<{ value: AfterExerciseBehavior; label: string; hint: string }> = [
@@ -53,6 +54,16 @@ export function SettingsScreen() {
       </div>
 
       <BackupCard />
+
+      <div className="card">
+        <h2 className="card__title">About</h2>
+        <dl className="about">
+          <dt>Version</dt>
+          <dd>{__APP_VERSION__}</dd>
+          <dt>Updated</dt>
+          <dd>{timestampToLocalDateTime(__BUILD_TIME__)}</dd>
+        </dl>
+      </div>
     </section>
   )
 }

@@ -55,3 +55,17 @@ export function nowTimestamp(now: Date = new Date()): Timestamp {
 export function timestampToLocalDate(timestamp: Timestamp): DateISO {
   return toDateISO(new Date(timestamp))
 }
+
+/**
+ * Format an ISO-8601 timestamp as a human-readable local date + time, e.g.
+ * "Sep 1, 2026, 12:30 PM". Used for the build/updated time in Settings.
+ */
+export function timestampToLocalDateTime(timestamp: Timestamp): string {
+  return new Date(timestamp).toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}

@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -8,9 +9,19 @@ import { VitePWA } from 'vite-plugin-pwa'
 // build; local dev/preview keep '/'. Router basename and PWA scope derive from it.
 const base = process.env.BASE_PATH ?? '/'
 
+// App version (from package.json) and build timestamp, baked in at build time
+// and surfaced in Settings. CI can override the timestamp via BUILD_TIME.
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'))
+const appVersion = pkg.version as string
+const buildTime = process.env.BUILD_TIME ?? new Date().toISOString()
+
 // https://vite.dev/config/
 export default defineConfig({
   base,
+  define: {
+    __APP_VERSION__: JSON.stringify(appVersion),
+    __BUILD_TIME__: JSON.stringify(buildTime),
+  },
   plugins: [
     react(),
     VitePWA({

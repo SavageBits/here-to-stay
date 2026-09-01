@@ -850,6 +850,24 @@ a.btn {
   font-size: 0.85rem;
 }
 
+/* ---- About ---- */
+.about {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+}
+
+.about dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.about dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---- Backup card ---- */
 .backup__hint {
   margin: 0 0 1rem;
