@@ -173,12 +173,38 @@ transaction table list. This is exactly why the persistence layer is tested.
 
 ---
 
-## Phase 4 — App Shell & Navigation
+## Phase 4 — App Shell & Navigation  ✅ COMPLETE (2026-08-31)
 
-- [ ] `App.tsx`: React Router with routes from architecture §6.
-- [ ] Mobile-first layout shell (single column, bottom nav or header).
-- [ ] Run seed on first launch; wire React Query / `useLiveQuery` provider.
-- [ ] Shared components: number/weight input, set row, confirm-delete dialog.
+**50 tests passing (adds an App-shell render test). Typecheck, lint, build clean.
+Dev server serves `/` and SPA routes (200).**
+
+- [x] `App.tsx`: React Router with all routes from architecture §6 (dashboard,
+      weight, trend, templates, start-workout, active-workout, history, detail,
+      exercise-history, settings) + catch-all redirect to `/`.
+- [x] Mobile-first layout shell (`components/Layout.tsx`): single column with a
+      fixed thumb-friendly bottom nav (Today / Weight / History / Workouts /
+      Settings); dark high-contrast theme in `index.css`.
+- [x] Run seed on first launch via `hooks/useSeed.ts` (loading gate until
+      `seedIfEmpty` resolves); wire `QueryClientProvider` (React Query available
+      for imperative async; reads will use Dexie `useLiveQuery` in later phases).
+- [x] Shared components: `NumberField` (decimal input mode for mobile keypads),
+      `ConfirmDialog` (destructive-action confirmation). Per-feature set-row
+      component deferred to Phase 7 where the logging UI defines its exact shape.
+- [x] Placeholder screens for every route so navigation works now; each names
+      the phase that fills it in.
+- [x] App-shell render test (`App.test.tsx`): provider + router mount, seed gate
+      resolves, dashboard + bottom nav render (uses `fake-indexeddb/auto` in the
+      test setup for the real `db` singleton).
+
+**Cleanup:** removed scaffold `App.css`, `src/assets/`, and all `.gitkeep`
+placeholders (folders now hold real files).
+
+**Note:** the set-row shared component from the original checklist is intentionally
+built in Phase 7 (Workout Logging) rather than here — its props depend on the
+logging interaction (auto-add set, target vs actual weight) defined there.
+
+**Next:** Phase 5 — Weight Tracking feature (log/edit/delete, 7-day average,
+trend chart).
 
 ---
 
