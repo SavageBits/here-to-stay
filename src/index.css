@@ -57,7 +57,8 @@ h1 {
      status bar in standalone PWA mode (black-translucent status bar draws
      content behind it). Side padding respects notch insets too. */
   padding: calc(1rem + env(safe-area-inset-top)) calc(1rem + env(safe-area-inset-right))
-    calc(var(--nav-height) + 1rem) calc(1rem + env(safe-area-inset-left));
+    calc(var(--nav-height) + 1rem + env(safe-area-inset-bottom))
+    calc(1rem + env(safe-area-inset-left));
   max-width: 640px;
   margin: 0 auto;
   width: 100%;
@@ -86,11 +87,12 @@ h1 {
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--nav-height);
   display: flex;
   background: var(--surface);
   border-top: 1px solid var(--border);
-  padding-bottom: env(safe-area-inset-bottom);
+  /* Size from content: even vertical padding centers the items, plus the iOS
+     safe-area inset added below so nothing sits under the home indicator. */
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
 }
 
 .nav-item {
@@ -99,7 +101,8 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
+  min-height: 48px; /* thumb-friendly tap target */
   text-decoration: none;
   color: var(--muted);
   font-size: 0.7rem;
