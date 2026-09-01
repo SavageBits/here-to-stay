@@ -751,8 +751,16 @@ a.btn {
   align-self: center;
 }
 
+/* Pinned to the bottom, well away from Save, and visually secondary so it
+   isn't mistaken for the frequent "Save set" action. */
 .focus__done {
-  margin-top: auto;
+  position: sticky;
+  bottom: 0.5rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--muted);
 }
 
 /* Compact recorded-sets summary. */
