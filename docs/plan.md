@@ -597,6 +597,23 @@ banner so deploys never swap the app mid-session.
       confirmed the version string is baked into the built bundle. **109 tests
       passing.**
 
+### Phase 10.5 — UI/UX polish + progression tweak (user requests, 2026-09-01)  ✅
+
+- [x] **iOS safe-area:** header no longer clips under the status bar in
+      standalone PWA — `.app-content` top/side padding includes
+      `env(safe-area-inset-*)` (viewport-fit=cover already set).
+- [x] **Bottom nav:** icons no longer crowd the top border — nav sized from
+      content with even vertical padding + safe-area inset below (was a fixed
+      height fighting `box-sizing: border-box`); items get a 48px tap target.
+- [x] **Progression — advance to highest clean weight (extends PRD §9.3):** on
+      success, `nextTarget = max(target + 5, highest weight used)`. Adding weight
+      mid-exercise (target too easy) now advances to that weight; plain
+      12×4-at-target still yields +5. A short set anywhere still means no change.
+      The weight-persists-across-sets UI default already existed
+      (`lastWeight ?? target`). Tests: 4 new progression cases + a repo
+      end-to-end (55→…→65 bumps template target to 65). **114 tests passing.**
+      Documented in architecture §4.1.
+
 ---
 
 ## Phase 11 — Hardening & Edge Cases (PRD §17)

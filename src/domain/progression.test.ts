@@ -86,6 +86,51 @@ describe('evaluateProgression — set-level rules', () => {
     expect(out.successful).toBe(true)
     expect(out.nextTargetWeight).toBe(65)
   })
+})
+
+describe('evaluateProgression — added weight mid-exercise (target too easy)', () => {
+  it('advances to the highest weight completed when it exceeds target + 5', () => {
+    // Target 55, added weight up to 65 across clean 12-rep sets.
+    const out = evaluateProgression({
+      targetWeight: 55,
+      sets: [set(55, 12), set(60, 12), set(65, 12), set(65, 12)],
+      skipped: false,
+    })
+    expect(out.successful).toBe(true)
+    expect(out.nextTargetWeight).toBe(65) // max(55+5, 65)
+  })
+
+  it('uses target + 5 when the highest weight does not exceed it', () => {
+    // Highest clean weight (57) is below target + 5 (60) → still +5.
+    const out = evaluateProgression({
+      targetWeight: 55,
+      sets: [set(55, 12), set(57, 12)],
+      skipped: false,
+    })
+    expect(out.successful).toBe(true)
+    expect(out.nextTargetWeight).toBe(60)
+  })
+
+  it('a short set anywhere means no change, even with heavier weight attempted', () => {
+    // 65 attempted but only 8 reps → not 12x4 → target unchanged (stays 55).
+    const out = evaluateProgression({
+      targetWeight: 55,
+      sets: [set(55, 12), set(60, 12), set(65, 8)],
+      skipped: false,
+    })
+    expect(out.successful).toBe(false)
+    expect(out.nextTargetWeight).toBe(55)
+  })
+
+  it('exactly target + 5 when the heaviest equals the stepped target', () => {
+    const out = evaluateProgression({
+      targetWeight: 55,
+      sets: [set(55, 12), set(60, 12)],
+      skipped: false,
+    })
+    expect(out.successful).toBe(true)
+    expect(out.nextTargetWeight).toBe(60) // max(60, 60)
+  })
 
   it('zero completed sets => not successful, target unchanged', () => {
     const out = evaluateProgression({ targetWeight: 60, sets: [], skipped: false })

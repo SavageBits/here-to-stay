@@ -132,8 +132,13 @@ Rules (all covered by tests):
 - **Bodyweight** (target null/0 and no weight) → no +5 rule (§16.14).
 - Successful **only when**: ≥1 set, every completed set reps ≥ 12, every completed
   set weight ≥ target (§9.2). Reps above 12 still count (§9.2).
-- Success → `nextTarget = target + 5`. Failure → `nextTarget = target`
-  (never reduced — §9.3, §16.10–11).
+- Success → `nextTarget = max(target + 5, highest weight used)`. Because every
+  set already cleared 12+ reps at ≥ target, the highest weight used is the
+  heaviest weight completed for a full set — so adding weight mid-exercise
+  (target was too easy) advances the target to that weight instead of only +5
+  (**extends PRD §9.3** per user request 2026-09-01). The plain 12×4-at-target
+  case still yields exactly +5, preserving the §9.4 examples. Failure →
+  `nextTarget = target` (never reduced — §9.3, §16.10–11).
 - **Idempotent by construction:** `nextTargetWeight` is computed from the target
   and the sets, so re-evaluating an unchanged workout yields the same result and
   cannot double-increment (§11, §16.15).

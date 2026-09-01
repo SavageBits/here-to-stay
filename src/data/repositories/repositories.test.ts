@@ -140,6 +140,33 @@ describe('sessionRepo — idempotency (PRD §11, §16.15)', () => {
     expect(after.progressionAchieved).toBe(false)
     expect(after.nextTargetWeight).toBe(55) // retained target, not lowered
   })
+
+  it('adding weight mid-session bumps the template target to the highest clean weight', async () => {
+    await seedIfEmpty(db)
+    const s = await startSession('A', db)
+    const incline = s.exercises.find(
+      (e) => e.exerciseNameSnapshot === 'Dumbbell Incline Press',
+    )! // target 55
+    // Clean 12s but progressively heavier — the target was too easy.
+    await addSet(incline.id, { weight: 55, reps: 12 }, db)
+    await addSet(incline.id, { weight: 60, reps: 12 }, db)
+    await addSet(incline.id, { weight: 65, reps: 12 }, db)
+    await addSet(incline.id, { weight: 65, reps: 12 }, db)
+    await db.workoutExercises.update(incline.id, { completed: true })
+    await completeSession(s.session.id, db)
+
+    // Next target = highest clean weight (65), not just 55 + 5.
+    expect((await db.workoutExercises.get(incline.id))!.nextTargetWeight).toBe(65)
+    const views = await getTemplateExerciseViews('A', db)
+    expect(views.find((v) => v.name === 'Dumbbell Incline Press')?.targetWeight).toBe(65)
+
+    // And the following session suggests 65.
+    const next = await startSession('A', db)
+    const nextIncline = next.exercises.find(
+      (e) => e.exerciseNameSnapshot === 'Dumbbell Incline Press',
+    )
+    expect(nextIncline?.targetWeightSnapshot).toBe(65)
+  })
 })
 
 describe('templateRepo / exerciseRepo — history immune to rename (PRD §16.3-4)', () => {
