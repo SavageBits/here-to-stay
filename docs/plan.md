@@ -41,14 +41,27 @@ proven correct in isolation.
 
 ---
 
-## Phase 1 — Domain Types & Data Model
+## Phase 1 — Domain Types & Data Model  ✅ COMPLETE (2026-08-31)
 
-- [ ] Define shared domain types in `domain/types.ts` (WorkoutType, DateISO,
-      SetResult, enums).
-- [ ] Define entity interfaces matching PRD §15: `WeightEntry`, `WorkoutTemplate`,
-      `Exercise`, `WorkoutTemplateExercise`, `WorkoutSession`, `WorkoutExercise`,
-      `ExerciseSet`.
-- [ ] Add `lib/ids.ts` (UUID) and `lib/dates.ts` (calendar-day helpers).
+- [x] Define shared domain types in `domain/types.ts` (WorkoutType, WorkoutStatus,
+      DateISO, Timestamp, TrendDirection, TrendRange, SetResult).
+- [x] Define entity interfaces matching PRD §15 in `domain/entities.ts`:
+      `WeightEntry`, `WorkoutTemplate`, `Exercise`, `WorkoutTemplateExercise`,
+      `WorkoutSession`, `WorkoutExercise`, `ExerciseSet` — each documented with
+      its PRD reference and history/idempotency notes.
+- [x] Add `lib/ids.ts` (`newId()` via `crypto.randomUUID()`) and `lib/dates.ts`
+      (calendar-day helpers on `date-fns`: `today`, `toDateISO`, `subtractDays`,
+      `calendarDaysBetween`, `isWithinRange`, `nowTimestamp`).
+- [x] `tsc -b` typecheck clean, lint clean, tests green.
+
+**Note:** entity interfaces live in `domain/entities.ts` (split from `types.ts`)
+so pure logic and repositories share one source of truth without `data/`
+depending on UI. Nullable fields (`weight`, `targetWeight`, `progressionAchieved`,
+`nextTargetWeight`, `completedAt`, `archivedAt`) are explicitly typed to encode
+bodyweight/incomplete/history states from the PRD.
+
+**Next:** Phase 2 — pure business logic, test-first (progression, weight stats,
+workout builder).
 
 ---
 
