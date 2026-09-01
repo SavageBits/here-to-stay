@@ -270,6 +270,15 @@ Key UX behaviors from the PRD:
 - **Backup:** Settings screen exposes JSON (full fidelity) and CSV (weights,
   sets) export, plus JSON import — a safety net given local-only storage (§19).
 - **Offline/PWA:** app shell cached; all data local, so it works fully offline.
+- **Data durability:** IndexedDB is local to the browser/origin and *can* be
+  lost — clearing site data, iOS Safari's ~7-day eviction of non-installed sites,
+  storage pressure, private mode, or a new device/browser. Mitigations:
+  (1) request persistent storage on startup (`navigator.storage.persist()`,
+  `lib/persistStorage.ts`) to exempt us from eviction where supported;
+  (2) track `lastBackupAt` and nudge in Settings when a backup is stale/never;
+  (3) the JSON export/import is the authoritative recovery path. Installing to the
+  home screen is the strongest protection on iOS. Cloud sync stays out of scope
+  (PRD §21).
 
 ---
 

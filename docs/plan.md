@@ -539,6 +539,37 @@ lint, build clean. Production build verified: manifest + SW + all icons serve 20
 **Note:** bundle ~801 KB (231 KB gzip), Recharts-dominated — acceptable for a
 local PWA; code-splitting remains a deferred, non-blocking optimization.
 
+### Phase 10.1 — Deploy to GitHub Pages (user request, 2026-08-31)  ✅
+
+Managed-machine firewall (MDM profile) + TLS-inspection blocked LAN access and
+cloudflared tunneling, so deployed to a public static host instead — build runs
+on GitHub's runners, the Mac only pushes.
+
+- [x] `vite` base + PWA `start_url`/`scope` from `BASE_PATH` env; router
+      `basename` from `import.meta.env.BASE_URL` (root locally, `/here-to-stay/`
+      on Pages).
+- [x] `.github/workflows/deploy.yml`: `npm ci` + test + build (BASE_PATH) +
+      `404.html` SPA fallback → `actions/deploy-pages`.
+- [x] Repo `SavageBits/here-to-stay` (public), Pages source = GitHub Actions.
+- [x] **Live + verified: https://savagebits.github.io/here-to-stay/** (index,
+      manifest, sw.js, icons all 200; assets under the subpath). Auto-redeploys on
+      push to `main`.
+
+### Phase 10.2 — Data durability hardening (user concern, 2026-08-31)  ✅
+
+Addressed "can the local data be lost?" — yes (clear site data, iOS 7-day
+eviction of non-installed sites, storage pressure, private mode, new device).
+
+- [x] `lib/persistStorage.ts`: `requestPersistentStorage()` on startup (exempts
+      IndexedDB from eviction where supported) + `getPersistence()`.
+- [x] `AppSettings.lastBackupAt` + `markBackedUp()`; JSON export stamps it.
+- [x] Settings **durability panel**: shows last-backup ("today" / "N days ago" /
+      never), warns when stale (>7 days) or never, and nudges to install to home
+      screen / keep backups when storage isn't persisted.
+- [x] Tests: `persistStorage.test.ts` (5 — unsupported/persisted/request paths);
+      BackupCard never→export→"today" + stamps `lastBackupAt`. Documented the
+      full risk + mitigations in architecture §7. **105 tests passing.**
+
 ---
 
 ## Phase 11 — Hardening & Edge Cases (PRD §17)

@@ -36,6 +36,21 @@ describe('BackupCard', () => {
     )
   })
 
+  it('warns when there is no backup, then records one after export', async () => {
+    const user = userEvent.setup()
+    render(<BackupCard />)
+    // Fresh state → never backed up warning (icon + text are separate nodes).
+    await waitFor(() =>
+      expect(screen.getByText(/never exported a backup/)).toBeInTheDocument(),
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Export backup (JSON)' }))
+
+    // The export stamps last-backup; the durability line updates to "today".
+    await waitFor(() => expect(screen.getByText(/Last backup: today/)).toBeInTheDocument())
+    expect((await db.settings.get('app'))?.lastBackupAt).toBeTruthy()
+  })
+
   it('imports a backup after confirmation, replacing current data', async () => {
     const user = userEvent.setup()
 

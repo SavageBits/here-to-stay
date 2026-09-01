@@ -127,6 +127,11 @@ export type AfterExerciseBehavior = 'list' | 'next'
 export interface AppSettings {
   id: 'app'
   afterExercise: AfterExerciseBehavior
+  /**
+   * When the user last exported a JSON backup, so the app can nudge them to
+   * back up their local-only data. `null`/absent = never backed up.
+   */
+  lastBackupAt?: Timestamp | null
   updatedAt: Timestamp
 }
 

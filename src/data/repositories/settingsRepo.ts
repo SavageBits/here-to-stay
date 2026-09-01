@@ -11,6 +11,7 @@ import { nowTimestamp } from '../../lib/dates'
 export const DEFAULT_SETTINGS: AppSettings = {
   id: 'app',
   afterExercise: 'list',
+  lastBackupAt: null,
   updatedAt: '',
 }
 
@@ -31,6 +32,18 @@ export async function setAfterExercise(
   await db.settings.put({
     ...(await getSettings(db)),
     afterExercise: behavior,
+    updatedAt: nowTimestamp(),
+  })
+}
+
+/** Record that the user just exported a JSON backup. */
+export async function markBackedUp(
+  db: HealthDB = defaultDb,
+  at: string = nowTimestamp(),
+): Promise<void> {
+  await db.settings.put({
+    ...(await getSettings(db)),
+    lastBackupAt: at,
     updatedAt: nowTimestamp(),
   })
 }

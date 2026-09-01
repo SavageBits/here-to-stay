@@ -4,7 +4,7 @@
  * import confirms first since it is destructive.
  */
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ConfirmDialog } from '../../components/ConfirmDialog'
 import {
   exportBackupJson,
@@ -12,8 +12,11 @@ import {
   exportWorkoutSetsCsv,
   importBackupJson,
 } from '../../data/repositories/backupRepo'
+import { markBackedUp } from '../../data/repositories/settingsRepo'
 import { downloadTextFile, readFileText, stampedName } from '../../lib/download'
-import { today } from '../../lib/dates'
+import { calendarDaysBetween, timestampToLocalDate, today } from '../../lib/dates'
+import { getPersistence, type PersistenceState } from '../../lib/persistStorage'
+import { useSettings } from '../../hooks/useSettings'
 
 type Status = { kind: 'idle' } | { kind: 'ok'; message: string } | { kind: 'error'; message: string }
 
@@ -21,11 +24,18 @@ export function BackupCard() {
   const fileInput = useRef<HTMLInputElement>(null)
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const [pendingJson, setPendingJson] = useState<string | null>(null)
+  const [persistence, setPersistence] = useState<PersistenceState | null>(null)
+  const settings = useSettings()
+
+  useEffect(() => {
+    getPersistence().then(setPersistence)
+  }, [])
 
   async function handleExportJson() {
     try {
       const json = await exportBackupJson()
       downloadTextFile(`${stampedName('health-backup', today())}.json`, json, 'application/json')
+      await markBackedUp()
       setStatus({ kind: 'ok', message: 'JSON backup downloaded.' })
     } catch (err) {
       setStatus({ kind: 'error', message: `Export failed: ${String(err)}` })
@@ -70,6 +80,19 @@ export function BackupCard() {
     }
   }
 
+  // Days since last backup and whether to nudge (never, or > 7 days ago).
+  const lastBackupAt = settings.lastBackupAt ?? null
+  const daysSinceBackup =
+    lastBackupAt !== null ? calendarDaysBetween(timestampToLocalDate(lastBackupAt), today()) : null
+  const backupStale = daysSinceBackup === null || daysSinceBackup > 7
+
+  const lastBackupLabel =
+    daysSinceBackup === null
+      ? 'You have never exported a backup.'
+      : daysSinceBackup === 0
+        ? 'Last backup: today.'
+        : `Last backup: ${daysSinceBackup} day${daysSinceBackup === 1 ? '' : 's'} ago (${timestampToLocalDate(lastBackupAt!)}).`
+
   return (
     <div className="card">
       <h2 className="card__title">Backup &amp; data</h2>
@@ -77,6 +100,20 @@ export function BackupCard() {
         Your data lives only on this device. Export a backup regularly so you can
         restore it if the browser data is cleared.
       </p>
+
+      <div className={`backup__durability${backupStale ? ' backup__durability--warn' : ''}`}>
+        <p className="backup__durability-line">
+          {backupStale ? '⚠️ ' : '✓ '}
+          {lastBackupLabel}
+        </p>
+        {persistence && !persistence.persisted && (
+          <p className="backup__durability-line muted">
+            {persistence.supported
+              ? 'Tip: install this app to your home screen to help the browser keep your data.'
+              : 'This browser may clear stored data over time — keep backups.'}
+          </p>
+        )}
+      </div>
 
       <div className="backup__group">
         <button type="button" className="btn btn--primary btn--block" onClick={handleExportJson}>

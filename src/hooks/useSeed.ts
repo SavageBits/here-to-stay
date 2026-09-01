@@ -7,12 +7,17 @@
 import { useEffect, useState } from 'react'
 import { seedIfEmpty } from '../data/seed'
 import { mergeDuplicateExercises } from '../data/repositories/exerciseRepo'
+import { requestPersistentStorage } from '../lib/persistStorage'
 
 export function useSeed(): boolean {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
     let cancelled = false
+    // Ask the browser to keep our IndexedDB from being evicted (best-effort;
+    // independent of seeding, so failures here don't block startup).
+    requestPersistentStorage().catch(() => {})
+
     seedIfEmpty()
       .then(() => mergeDuplicateExercises())
       .then((removed) => {

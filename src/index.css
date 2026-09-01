@@ -824,6 +824,27 @@ a.btn {
   font-size: 0.85rem;
 }
 
+.backup__durability {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.backup__durability--warn {
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.backup__durability-line {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.backup__durability-line + .backup__durability-line {
+  margin-top: 0.4rem;
+}
+
 .backup__group {
   margin-bottom: 1rem;
 }
