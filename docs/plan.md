@@ -356,6 +356,27 @@ Reworked the active-workout UI from a scrollable list of exercise cards to a
       previously assumed one seeded set. Note: only affects sessions started
       after this change; a pre-existing in-progress session keeps its stray set.
 
+### Phase 7.2 — Abandon workout (user request, 2026-08-31)  ✅
+
+Previously the only way out of an in-progress workout was to complete it. Added
+the ability to abandon one (PRD §17 — "Workout abandoned before completion"):
+
+- [x] `abandonSession(sessionId)`: deletes the session and all its exercises +
+      sets in one transaction. An abandoned workout leaves no history and does not
+      touch progression targets.
+- [x] "Abandon Workout" button on the workout list view → confirm dialog
+      ("discards the workout and everything logged; progression not affected") →
+      deletes and navigates home.
+- [x] Tests: `abandon.test.ts` (3) — deletes session + children; progression
+      targets untouched; completed history untouched. WorkoutScreen UI tests for
+      abandon-confirm (navigates home, session gone) and abandon-cancel (stays,
+      session intact).
+- [x] **Test-isolation hardening:** a global `beforeEach` in `src/test/setup.ts`
+      now clears the shared `db` before every test, fixing an intermittent
+      cross-file data-bleed flake (component tests all use the same `db`
+      singleton; repo tests use isolated dbs and are unaffected). Verified stable
+      across repeated full-suite runs. **84 tests passing.**
+
 ---
 
 ## Phase 8 — Dashboard / Today (PRD §4)

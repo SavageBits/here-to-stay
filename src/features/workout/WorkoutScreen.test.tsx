@@ -34,6 +34,7 @@ function renderAt(sessionId: string) {
   return render(
     <MemoryRouter initialEntries={[`/workout/${sessionId}`]}>
       <Routes>
+        <Route path="/" element={<div>Home dashboard</div>} />
         <Route path="/workout/:sessionId" element={<WorkoutScreen />} />
         <Route path="/history/:sessionId" element={<div>History detail</div>} />
       </Routes>
@@ -108,5 +109,35 @@ describe('WorkoutScreen (focused redesign)', () => {
     await waitFor(() => expect(screen.getByText('History detail')).toBeInTheDocument())
     const views = await getTemplateExerciseViews('A', db)
     expect(views.find((v) => v.name === 'Dumbbell Incline Press')?.targetWeight).toBe(60)
+  })
+
+  it('abandons the workout: confirms, navigates home, and deletes the session', async () => {
+    const user = userEvent.setup()
+    const { session } = await startSession('A', db)
+    renderAt(session.id)
+    await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
+
+    await user.click(screen.getByRole('button', { name: 'Abandon Workout' }))
+    const dialog = screen.getByRole('alertdialog')
+    await user.click(within(dialog).getByRole('button', { name: 'Abandon' }))
+
+    // Navigated home and the session is gone.
+    await waitFor(() => expect(screen.getByText('Home dashboard')).toBeInTheDocument())
+    expect(await db.workoutSessions.get(session.id)).toBeUndefined()
+  })
+
+  it('keeps the workout when abandon is cancelled', async () => {
+    const user = userEvent.setup()
+    const { session } = await startSession('A', db)
+    renderAt(session.id)
+    await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
+
+    await user.click(screen.getByRole('button', { name: 'Abandon Workout' }))
+    const dialog = screen.getByRole('alertdialog')
+    await user.click(within(dialog).getByRole('button', { name: 'Keep going' }))
+
+    // Still on the workout; session intact.
+    expect(screen.getByRole('button', { name: 'Complete Workout' })).toBeInTheDocument()
+    expect(await db.workoutSessions.get(session.id)).toBeDefined()
   })
 })

@@ -615,6 +615,11 @@ a.btn {
   margin-top: 1rem;
 }
 
+.workout__abandon {
+  margin-top: 0.6rem;
+  color: var(--danger);
+}
+
 /* ---- Workout: focused single-exercise view ---- */
 .focus {
   display: flex;

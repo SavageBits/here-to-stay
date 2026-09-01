@@ -10,6 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { useSettings } from '../../hooks/useSettings'
 import {
+  abandonSession,
   addSet,
   completeSession,
   deleteSet,
@@ -27,6 +28,7 @@ export function WorkoutScreen() {
   const settings = useSettings()
   const [focusIndex, setFocusIndex] = useState<number | null>(null)
   const [confirmComplete, setConfirmComplete] = useState(false)
+  const [confirmAbandon, setConfirmAbandon] = useState(false)
   const [completing, setCompleting] = useState(false)
 
   if (loaded === undefined) return <p className="muted screen">Loading…</p>
@@ -75,6 +77,12 @@ export function WorkoutScreen() {
     navigate(`/history/${sessionId}`, { replace: true })
   }
 
+  async function handleAbandon() {
+    if (!sessionId) return
+    await abandonSession(sessionId)
+    navigate('/', { replace: true })
+  }
+
   const dateLabel = view.session.startedAt.slice(0, 10)
 
   return (
@@ -115,6 +123,13 @@ export function WorkoutScreen() {
       >
         Complete Workout
       </button>
+      <button
+        type="button"
+        className="btn btn--ghost btn--block workout__abandon"
+        onClick={() => setConfirmAbandon(true)}
+      >
+        Abandon Workout
+      </button>
 
       <ConfirmDialog
         open={confirmComplete}
@@ -124,6 +139,16 @@ export function WorkoutScreen() {
         cancelLabel="Keep editing"
         onConfirm={handleComplete}
         onCancel={() => setConfirmComplete(false)}
+      />
+
+      <ConfirmDialog
+        open={confirmAbandon}
+        title="Abandon workout?"
+        message="This discards the workout and everything logged in it. Progression is not affected. This cannot be undone."
+        confirmLabel="Abandon"
+        cancelLabel="Keep going"
+        onConfirm={handleAbandon}
+        onCancel={() => setConfirmAbandon(false)}
       />
     </section>
   )

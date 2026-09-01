@@ -321,6 +321,35 @@ export async function reopenSession(
   })
 }
 
+/**
+ * Abandon an in-progress workout (PRD §17). Deletes the session and all its
+ * exercises and sets — an abandoned workout never happened, so it must not
+ * appear in history or affect progression. No-op / safe for a session that has
+ * already been completed is prevented by the caller (only offered while
+ * in_progress); this deletes whatever session id is given along with its
+ * children.
+ */
+export async function abandonSession(
+  sessionId: string,
+  db: HealthDB = defaultDb,
+): Promise<void> {
+  await db.transaction(
+    'rw',
+    [db.workoutSessions, db.workoutExercises, db.exerciseSets],
+    async () => {
+      const exercises = await db.workoutExercises
+        .where('workoutSessionId')
+        .equals(sessionId)
+        .toArray()
+      for (const we of exercises) {
+        await db.exerciseSets.where('workoutExerciseId').equals(we.id).delete()
+      }
+      await db.workoutExercises.where('workoutSessionId').equals(sessionId).delete()
+      await db.workoutSessions.delete(sessionId)
+    },
+  )
+}
+
 /** Completed sessions, most recent first (PRD §12 history). */
 export async function listCompletedSessions(
   db: HealthDB = defaultDb,
