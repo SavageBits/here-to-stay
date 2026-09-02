@@ -41,6 +41,7 @@ export function NumberField({
             const raw = e.target.value
             onChange(raw === '' ? null : Number(raw))
           }}
+          onFocus={(e) => e.target.select()}
         />
         {suffix && <span className="number-field__suffix">{suffix}</span>}
       </span>

@@ -88,6 +88,7 @@ export function FocusedExercise({
           min={0}
           value={reps ?? ''}
           onChange={(e) => setReps(e.target.value === '' ? null : Number(e.target.value))}
+          onFocus={(e) => e.target.select()}
           aria-label={`Reps for set ${nextSetNumber}`}
         />
       </div>

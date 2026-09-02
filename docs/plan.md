@@ -640,6 +640,13 @@ set is saved (auto-restarts) or dismissed. `add()` after finish resumes running.
 Timer tests expanded to 8 (finished state persists; add resumes). **124 tests
 passing.**
 
+**Fix (user request): number fields now select their value on focus.** Added
+`onFocus={(e) => e.target.select()}` to the reps input and the shared
+`NumberField` — tapping a numeric field (reps default 12, weight, target, rest,
+weigh-in) highlights the current value so the first keystroke replaces it instead
+of appending. Test: focus reps → type "8" → value is "8" (not "128"), saved as 8.
+**125 tests passing.**
+
 ---
 
 ## Phase 11 — Hardening & Edge Cases (PRD §17)

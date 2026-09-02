@@ -77,6 +77,30 @@ describe('WorkoutScreen (focused redesign)', () => {
     expect(sets[0].reps).toBe(12)
   })
 
+  it('clears the default reps on focus so typing replaces it', async () => {
+    const user = userEvent.setup()
+    const { session, exercises } = await startSession('A', db)
+    const incline = exercises.find((e) => e.exerciseNameSnapshot === 'Dumbbell Incline Press')!
+
+    renderAt(session.id)
+    await waitFor(() => expect(screen.getByText('Dumbbell Incline Press')).toBeInTheDocument())
+    await user.click(screen.getByText('Dumbbell Incline Press'))
+
+    const repsInput = screen.getByLabelText('Reps for set 1') as HTMLInputElement
+    expect(repsInput.value).toBe('12')
+
+    // Focusing selects the value; typing replaces it rather than appending.
+    await user.click(repsInput)
+    await user.keyboard('8')
+    expect(repsInput.value).toBe('8')
+
+    await user.click(screen.getByRole('button', { name: 'Save set 1' }))
+    await waitFor(async () => {
+      const sets = await db.exerciseSets.where('workoutExerciseId').equals(incline.id).toArray()
+      expect(sets[0]?.reps).toBe(8)
+    })
+  })
+
   it('returns to the list after "Done with Exercise" (default setting)', async () => {
     const user = userEvent.setup()
     const { session } = await startSession('A', db)
