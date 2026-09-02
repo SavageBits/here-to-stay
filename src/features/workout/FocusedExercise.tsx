@@ -142,6 +142,31 @@ export function FocusedExercise({
         </div>
       )}
 
+      {timer.finished && (
+        <div className="rest-timer rest-timer--done" role="alert">
+          <div className="rest-timer__count">0:00</div>
+          <div className="rest-timer__label">Rest complete — go!</div>
+          <div className="rest-timer__actions">
+            <button
+              type="button"
+              className="btn btn--ghost rest-timer__btn"
+              onClick={() => timer.add(30)}
+              aria-label="Rest 30 more seconds"
+            >
+              +30s
+            </button>
+            <button
+              type="button"
+              className="btn btn--ghost rest-timer__btn"
+              onClick={timer.skip}
+              aria-label="Dismiss rest timer"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Compact recorded-sets summary (does not push the controls around) */}
       {recorded.length > 0 && (
         <div className="focus__recorded">

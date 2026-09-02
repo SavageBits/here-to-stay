@@ -632,6 +632,14 @@ banner so deploys never swap the app mid-session.
       no-op, formatRest); builder carries rest; repo end-to-end template→session
       snapshot. **122 tests passing.**
 
+**Fix (user report): timer vanished at zero with no cue.** It set `endAt = null`
+on finish, so the card (rendered on `running`) disappeared. Added a distinct
+`finished` phase: at zero the timer shows a persistent **green pulsing "Rest
+complete — go!"** card (color change) with +30s / Dismiss, staying until the next
+set is saved (auto-restarts) or dismissed. `add()` after finish resumes running.
+Timer tests expanded to 8 (finished state persists; add resumes). **124 tests
+passing.**
+
 ---
 
 ## Phase 11 — Hardening & Edge Cases (PRD §17)

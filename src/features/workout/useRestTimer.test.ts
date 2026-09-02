@@ -37,13 +37,38 @@ describe('useRestTimer', () => {
     expect(result.current.remaining).toBe(50)
   })
 
-  it('reaches zero, vibrates, and stops running', () => {
+  it('reaches zero, vibrates, and enters the finished state (not hidden)', () => {
     const { result } = renderHook(() => useRestTimer())
     act(() => result.current.start(5))
     advance(5)
     expect(result.current.remaining).toBe(0)
     expect(result.current.running).toBe(false)
+    expect(result.current.finished).toBe(true)
+    expect(result.current.phase).toBe('finished')
     expect(navigator.vibrate).toHaveBeenCalled()
+  })
+
+  it('stays finished until dismissed (skip clears it to idle)', () => {
+    const { result } = renderHook(() => useRestTimer())
+    act(() => result.current.start(3))
+    advance(3)
+    expect(result.current.finished).toBe(true)
+    // Time passing further does not hide it.
+    advance(30)
+    expect(result.current.finished).toBe(true)
+    act(() => result.current.skip())
+    expect(result.current.phase).toBe('idle')
+    expect(result.current.finished).toBe(false)
+  })
+
+  it('adding time after finish resumes running', () => {
+    const { result } = renderHook(() => useRestTimer())
+    act(() => result.current.start(3))
+    advance(3)
+    expect(result.current.finished).toBe(true)
+    act(() => result.current.add(30))
+    expect(result.current.running).toBe(true)
+    expect(result.current.remaining).toBe(30)
   })
 
   it('skip stops the countdown immediately', () => {
