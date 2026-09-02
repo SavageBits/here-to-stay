@@ -201,6 +201,7 @@ h1 {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 0 0.75rem;
+  min-width: 0; /* allow shrinking inside grid/flex parents */
 }
 
 .number-field__control input {
@@ -316,7 +317,9 @@ h1 {
 
 .weight-form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0, 1fr) lets each column shrink below its content's intrinsic width
+     — without it the wide iOS date control forces the grid past the card edge. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 0.75rem;
   margin-bottom: 0.85rem;
 }
@@ -328,6 +331,7 @@ h1 {
   font-size: 1.1rem;
   padding: 0.75rem 0;
   width: 100%;
+  min-width: 0;
 }
 
 .weight-form input[type='date']:focus {
