@@ -56,6 +56,7 @@ export async function getTemplateExerciseViews(
       name: exercise.name,
       sortOrder: row.sortOrder,
       targetWeight: row.targetWeight,
+      restSeconds: row.restSeconds ?? null,
     })
   }
   return views
@@ -206,6 +207,18 @@ export async function setTemplateTargetWeight(
 ): Promise<void> {
   await db.templateExercises.update(templateExerciseId, {
     targetWeight,
+    updatedAt: nowTimestamp(),
+  })
+}
+
+/** Set the rest-timer duration (seconds) for a template exercise; `null` = off. */
+export async function setTemplateRestSeconds(
+  templateExerciseId: string,
+  restSeconds: number | null,
+  db: HealthDB = defaultDb,
+): Promise<void> {
+  await db.templateExercises.update(templateExerciseId, {
+    restSeconds,
     updatedAt: nowTimestamp(),
   })
 }

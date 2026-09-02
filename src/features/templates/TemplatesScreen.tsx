@@ -13,6 +13,7 @@ import {
   addExerciseToTemplate,
   removeExerciseFromTemplate,
   reorderTemplateExercises,
+  setTemplateRestSeconds,
   setTemplateTargetWeight,
 } from '../../data/repositories/templateRepo'
 import { renameExercise } from '../../data/repositories/exerciseRepo'
@@ -242,12 +243,24 @@ function TemplateExerciseRow({ row, isFirst, isLast, onMoveUp, onMoveDown, onRem
       <div className="template-row__controls">
         <div className="template-row__target">
           <NumberField
+            label="Target"
             value={te.targetWeight}
             onChange={(v) => setTemplateTargetWeight(te.id, v)}
             step={5}
             suffix="lb"
             placeholder="bodyweight"
             ariaLabel={`Target weight for ${exercise.name}`}
+          />
+        </div>
+        <div className="template-row__target">
+          <NumberField
+            label="Rest"
+            value={te.restSeconds ?? null}
+            onChange={(v) => setTemplateRestSeconds(te.id, v)}
+            step={15}
+            suffix="sec"
+            placeholder="none"
+            ariaLabel={`Rest seconds for ${exercise.name}`}
           />
         </div>
         <div className="template-row__reorder">

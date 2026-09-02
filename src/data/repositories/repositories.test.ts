@@ -8,7 +8,12 @@ import {
   listAllWeights,
   upsertWeight,
 } from './weightRepo'
-import { getTemplate, getTemplateExerciseViews, setTemplateTargetWeight } from './templateRepo'
+import {
+  getTemplate,
+  getTemplateExerciseViews,
+  setTemplateRestSeconds,
+  setTemplateTargetWeight,
+} from './templateRepo'
 import { renameExercise } from './exerciseRepo'
 import {
   addSet,
@@ -205,6 +210,24 @@ describe('templateRepo / exerciseRepo — history immune to rename (PRD §16.3-4
     await setTemplateTargetWeight(rows[0].id, 999, db)
     const views = await getTemplateExerciseViews('A', db)
     expect(views.some((v) => v.targetWeight === 999)).toBe(true)
+  })
+
+  it('per-exercise rest seconds flow from template into the session snapshot', async () => {
+    await seedIfEmpty(db)
+    const template = await getTemplate('A', db)
+    const rows = await db.templateExercises
+      .where('workoutTemplateId')
+      .equals(template!.id)
+      .sortBy('sortOrder')
+    // Set 180s rest on the first exercise (Deadlift).
+    await setTemplateRestSeconds(rows[0].id, 180, db)
+
+    const views = await getTemplateExerciseViews('A', db)
+    expect(views.find((v) => v.exerciseId === rows[0].exerciseId)?.restSeconds).toBe(180)
+
+    const { exercises } = await startSession('A', db)
+    const deadlift = exercises.find((e) => e.exerciseId === rows[0].exerciseId)
+    expect(deadlift?.restSecondsSnapshot).toBe(180)
   })
 })
 

@@ -21,6 +21,8 @@ export interface TemplateExerciseView {
   name: string
   sortOrder: number
   targetWeight: number | null
+  /** Per-exercise rest-timer seconds; `null`/absent = no rest timer. */
+  restSeconds?: number | null
 }
 
 /** The relevant outcome of an exercise in the previous session. */
@@ -43,6 +45,7 @@ export interface DraftExercise {
   exerciseNameSnapshot: string
   sortOrder: number
   targetWeightSnapshot: number | null
+  restSecondsSnapshot: number | null
   sets: DraftSet[]
 }
 
@@ -77,6 +80,7 @@ export function buildSessionFromPrevious(
       exerciseNameSnapshot: t.name, // current name, per PRD §7.3
       sortOrder: t.sortOrder,
       targetWeightSnapshot: target,
+      restSecondsSnapshot: t.restSeconds ?? null,
       // No sets are seeded: the focused logging view starts at "Set 1" and the
       // user records each set explicitly. Reps still default to 12 (DEFAULT_REPS)
       // in the UI when recording (PRD §7.5, §8.1).

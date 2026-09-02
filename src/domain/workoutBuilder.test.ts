@@ -115,4 +115,14 @@ describe('buildSessionFromPrevious — set defaults (PRD §7.4-7.5, §8.1)', () 
       'Third',
     ])
   })
+
+  it('carries the per-exercise rest seconds into the draft snapshot', () => {
+    const template: TemplateExerciseView[] = [
+      { exerciseId: 'e1', name: 'Deadlift', sortOrder: 0, targetWeight: 135, restSeconds: 180 },
+      { exerciseId: 'e2', name: 'Plank', sortOrder: 1, targetWeight: null }, // no rest set
+    ]
+    const draft = buildSessionFromPrevious('A', template, null)
+    expect(draft.exercises[0].restSecondsSnapshot).toBe(180)
+    expect(draft.exercises[1].restSecondsSnapshot).toBeNull()
+  })
 })

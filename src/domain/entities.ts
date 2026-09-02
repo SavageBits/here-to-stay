@@ -66,6 +66,11 @@ export interface WorkoutTemplateExercise {
   sortOrder: number
   /** Current suggested target weight; `null` for bodyweight (PRD §8.2, §16.14). */
   targetWeight: number | null
+  /**
+   * Rest timer duration in seconds, auto-started after saving a set. `null`/absent
+   * = no rest timer for this exercise. Added in schema v3 (optional field).
+   */
+  restSeconds?: number | null
   createdAt: Timestamp
   updatedAt: Timestamp
 }
@@ -97,6 +102,8 @@ export interface WorkoutExercise {
   sortOrder: number
   /** Target weight asked of the user this session; `null` for bodyweight. */
   targetWeightSnapshot: number | null
+  /** Rest-timer seconds for this exercise this session; `null`/absent = none. */
+  restSecondsSnapshot?: number | null
   /** Whether the user marked this exercise done (vs skipped/incomplete). */
   completed: boolean
   /**

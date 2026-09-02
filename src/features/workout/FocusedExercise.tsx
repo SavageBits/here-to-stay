@@ -12,6 +12,7 @@ import { NumberField } from '../../components/NumberField'
 import { DEFAULT_REPS } from '../../domain/workoutBuilder'
 import type { ExerciseSet, WorkoutExercise } from '../../domain/entities'
 import { fmtWeight } from '../weight/format'
+import { formatRest, useRestTimer } from './useRestTimer'
 
 interface FocusedExerciseProps {
   exercise: WorkoutExercise & { sets: ExerciseSet[] }
@@ -44,11 +45,16 @@ export function FocusedExercise({
   const [weight, setWeight] = useState<number | null>(defaultWeight)
   const [editingId, setEditingId] = useState<string | null>(null)
 
+  const restSeconds = exercise.restSecondsSnapshot ?? null
+  const timer = useRestTimer()
+
   async function handleSave() {
     await onRecordSet(weight, reps ?? DEFAULT_REPS)
     // Reset the draft for the NEXT set in place. Weight carries forward.
     setReps(DEFAULT_REPS)
     setWeight(weight)
+    // Auto-start the rest timer if this exercise has one configured.
+    if (restSeconds && restSeconds > 0) timer.start(restSeconds)
   }
 
   return (
@@ -102,6 +108,39 @@ export function FocusedExercise({
       <button type="button" className="btn btn--primary btn--block focus__save" onClick={handleSave}>
         Save set {nextSetNumber}
       </button>
+
+      {timer.running && (
+        <div className="rest-timer" role="timer" aria-live="off">
+          <div className="rest-timer__count">{formatRest(timer.remaining)}</div>
+          <div className="rest-timer__label">Rest</div>
+          <div className="rest-timer__actions">
+            <button
+              type="button"
+              className="btn btn--ghost rest-timer__btn"
+              onClick={() => timer.add(-15)}
+              aria-label="Subtract 15 seconds"
+            >
+              −15s
+            </button>
+            <button
+              type="button"
+              className="btn btn--ghost rest-timer__btn"
+              onClick={() => timer.add(15)}
+              aria-label="Add 15 seconds"
+            >
+              +15s
+            </button>
+            <button
+              type="button"
+              className="btn btn--ghost rest-timer__btn"
+              onClick={timer.skip}
+              aria-label="Skip rest"
+            >
+              Skip
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Compact recorded-sets summary (does not push the controls around) */}
       {recorded.length > 0 && (

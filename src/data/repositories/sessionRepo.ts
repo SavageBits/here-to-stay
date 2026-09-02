@@ -92,6 +92,7 @@ export async function startSession(
           exerciseNameSnapshot: d.exerciseNameSnapshot,
           sortOrder: d.sortOrder,
           targetWeightSnapshot: d.targetWeightSnapshot,
+          restSecondsSnapshot: d.restSecondsSnapshot,
           completed: false,
           progressionAchieved: null,
           nextTargetWeight: null,

@@ -614,6 +614,24 @@ banner so deploys never swap the app mid-session.
       end-to-end (55→…→65 bumps template target to 65). **114 tests passing.**
       Documented in architecture §4.1.
 
+### Phase 10.6 — Per-exercise rest timer (user request, 2026-09-01)  ✅
+
+- [x] Data: `WorkoutTemplateExercise.restSeconds` (configurable per exercise) +
+      `WorkoutExercise.restSecondsSnapshot` (session snapshot) — optional fields,
+      no schema bump. Carried through `buildSessionFromPrevious` and `startSession`;
+      exposed on `TemplateExerciseView`.
+- [x] `templateRepo.setTemplateRestSeconds`; Templates editor gains a "Rest (sec)"
+      field per exercise (step 15, blank = none).
+- [x] `useRestTimer` hook: wall-clock countdown (throttle-robust), `start`/`add`/
+      `skip`, vibrates once at zero (`navigator.vibrate`, ignored where absent).
+- [x] FocusedExercise: **"Save set" auto-starts the rest timer** when the exercise
+      has one; countdown card shows m:ss with −15s / +15s / Skip.
+- [x] Backup: new fields ride along in the full-table JSON export/import
+      automatically.
+- [x] Tests: `useRestTimer.test.ts` (6 — tick, finish+vibrate, skip, ±adjust,
+      no-op, formatRest); builder carries rest; repo end-to-end template→session
+      snapshot. **122 tests passing.**
+
 ---
 
 ## Phase 11 — Hardening & Edge Cases (PRD §17)
