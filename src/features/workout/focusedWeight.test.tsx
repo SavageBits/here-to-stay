@@ -201,8 +201,13 @@ describe('rest complete cue', () => {
       { timeout: 3000 },
     )
 
-    // The cue is passive: no dismiss affordance, and the primary control is
-    // still directly tappable (no blocking overlay).
+    // The countdown stays on screen reading 0:00 — the wash is the distance
+    // cue, the readout is the up-close detail.
+    expect(screen.getByText('0:00')).toBeInTheDocument()
+    expect(screen.getByText('Rest complete — go!')).toBeInTheDocument()
+
+    // Passive cue: nothing to dismiss, and the primary control is still
+    // directly tappable (no blocking overlay).
     expect(screen.queryByRole('button', { name: /Dismiss/i })).not.toBeInTheDocument()
 
     const save = screen.getByRole('button', { name: 'Save set 2' })

@@ -202,6 +202,27 @@ export function FocusedExercise({
         </div>
       )}
 
+      {/* Rest is up: the readout stays put and reads 0:00 — same position as the
+          running timer, so nothing jumps. The green wash is the at-a-distance
+          cue; this is the up-close detail. No dismiss: saving the next set
+          clears it. */}
+      {timer.finished && (
+        <div className="rest-timer rest-timer--done" role="alert">
+          <div className="rest-timer__count">0:00</div>
+          <div className="rest-timer__label">Rest complete — go!</div>
+          <div className="rest-timer__actions">
+            <button
+              type="button"
+              className="btn btn--ghost rest-timer__btn"
+              onClick={() => timer.add(30)}
+              aria-label="Rest 30 more seconds"
+            >
+              +30s
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Compact recorded-sets summary (does not push the controls around) */}
       {recorded.length > 0 && (
         <div className="focus__recorded">

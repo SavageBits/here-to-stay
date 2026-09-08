@@ -937,6 +937,27 @@ a.btn {
   color: #052e16;
 }
 
+/* The 0:00 readout sits on the green wash: dark plate, light text, so the
+   detail is legible up close while the wash does the across-the-room work. */
+.rest-timer--done {
+  border-color: #052e16;
+  background: rgba(5, 46, 22, 0.9);
+}
+
+.rest-timer--done .rest-timer__count,
+.rest-timer--done .rest-timer__label {
+  color: #ffffff;
+}
+
+.rest-timer--done .rest-timer__label {
+  font-weight: 700;
+}
+
+.rest-timer--done .rest-timer__btn {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+
 /* Dark card surfaces would punch holes in the wash — let the green through and
    outline them instead, so the colored area stays as large as possible. */
 .focus--rest-done .focus__recorded-btn,
