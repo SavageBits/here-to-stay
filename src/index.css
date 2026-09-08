@@ -61,8 +61,12 @@ h1 {
   /* Top padding includes the iOS safe-area inset so the header clears the
      status bar in standalone PWA mode (black-translucent status bar draws
      content behind it). Side padding respects notch insets too. */
+  /* Bottom padding must clear the fixed nav, which is itself 8px + a 48px item
+     + 8px, PLUS the safe-area inset it pads itself with. --nav-height covers
+     only the 64px base, so the inset is added here as well or the last row of
+     content slides under the nav on inset devices. */
   padding: calc(1rem + env(safe-area-inset-top)) calc(1rem + env(safe-area-inset-right))
-    calc(var(--nav-height) + 1rem + env(safe-area-inset-bottom))
+    calc(var(--nav-height) + 1.5rem + env(safe-area-inset-bottom))
     calc(1rem + env(safe-area-inset-left));
   max-width: 640px;
   margin: 0 auto;
@@ -911,24 +915,6 @@ a.btn {
   z-index: 1;
 }
 
-/* The fixed bottom nav is a sibling of the screen, so it keeps its own opaque
-   background and would otherwise stay a dark band across the bottom. Green it
-   too so the wash really is the whole display. :has() is supported on modern
-   mobile Safari/Chrome; where it isn't, the nav simply stays dark. */
-.app-shell:has(.focus--rest-done) .bottom-nav {
-  background: var(--success);
-  border-top-color: #052e16;
-}
-
-.app-shell:has(.focus--rest-done) .nav-item {
-  color: #052e16;
-}
-
-.app-shell:has(.focus--rest-done) .nav-item--active {
-  color: #052e16;
-  font-weight: 700;
-}
-
 /* Text needs to stay legible against the green. */
 .focus--rest-done .focus__name,
 .focus--rest-done .focus__set-indicator,
@@ -986,9 +972,10 @@ a.btn {
   color: #052e16;
 }
 
-/* Compact recorded-sets summary. */
+/* Compact recorded-sets summary. Trailing margin clears the fixed bottom nav —
+   this list is the final element in the focused view. */
 .focus__recorded {
-  margin: 1.75rem 0 1rem;
+  margin: 1.75rem 0 2rem;
 }
 
 .focus__recorded-title {
