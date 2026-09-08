@@ -5,12 +5,7 @@
 
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../data/db'
-import type {
-  Exercise,
-  ExerciseSet,
-  WorkoutExercise,
-  WorkoutSession,
-} from '../../domain/entities'
+import type { Exercise, ExerciseSet, WorkoutExercise, WorkoutSession } from '../../domain/entities'
 
 /** Completed sessions, most recent first, each with its completed-exercise count. */
 export interface HistoryRow {
@@ -61,6 +56,39 @@ export function useSessionDetail(
   }, [sessionId])
 }
 
+/**
+ * The single most recent COMPLETED occurrence of an exercise, for the at-a-glance
+ * "last time" panel in the focused logging view. `null` when the exercise has
+ * never been completed before. Excludes `excludeSessionId` so the in-progress
+ * workout never shows itself as its own "last session".
+ */
+export function useLastExerciseSession(
+  exerciseId: string | undefined,
+  excludeSessionId?: string,
+): ExerciseHistoryEntry | undefined | null {
+  return useLiveQuery(async () => {
+    if (!exerciseId) return null
+    const workoutExercises = await db.workoutExercises
+      .where('exerciseId')
+      .equals(exerciseId)
+      .toArray()
+
+    let best: ExerciseHistoryEntry | null = null
+    for (const we of workoutExercises) {
+      if (we.workoutSessionId === excludeSessionId) continue
+      const session = await db.workoutSessions.get(we.workoutSessionId)
+      if (!session || session.status !== 'completed') continue
+      if (best && (session.completedAt ?? '') <= (best.session.completedAt ?? '')) continue
+      const sets = await db.exerciseSets
+        .where('workoutExerciseId')
+        .equals(we.id)
+        .sortBy('setNumber')
+      best = { workoutExercise: we, sets, session }
+    }
+    return best
+  }, [exerciseId, excludeSessionId])
+}
+
 /** One occurrence of an exercise in history: the snapshot + its sets + date. */
 export interface ExerciseHistoryEntry {
   workoutExercise: WorkoutExercise
@@ -96,9 +124,7 @@ export function useExerciseHistory(exerciseId: string | undefined): ExerciseHist
         .sortBy('setNumber')
       entries.push({ workoutExercise: we, sets, session })
     }
-    entries.sort((a, b) =>
-      (b.session.completedAt ?? '').localeCompare(a.session.completedAt ?? ''),
-    )
+    entries.sort((a, b) => (b.session.completedAt ?? '').localeCompare(a.session.completedAt ?? ''))
     return { exercise, entries }
   }, [exerciseId])
 }

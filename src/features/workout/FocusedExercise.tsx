@@ -11,6 +11,8 @@ import { useState } from 'react'
 import { NumberField } from '../../components/NumberField'
 import { DEFAULT_REPS } from '../../domain/workoutBuilder'
 import type { ExerciseSet, WorkoutExercise } from '../../domain/entities'
+import { timestampToLocalDate } from '../../lib/dates'
+import { useLastExerciseSession } from '../history/useHistory'
 import { fmtWeight } from '../weight/format'
 import { formatRest, useRestTimer } from './useRestTimer'
 
@@ -36,7 +38,10 @@ export function FocusedExercise({
   const recorded = exercise.sets
   const nextSetNumber = recorded.length + 1
 
-  // The weight to pre-fill: last recorded set's weight, else the target.
+  // Working weight starts at THIS exercise's target and then carries forward
+  // whatever the user last used for it. WorkoutScreen keys this component by
+  // exercise id, so these initializers re-run per exercise and never inherit a
+  // weight from the exercise before it.
   const lastWeight = recorded.length ? recorded[recorded.length - 1].weight : null
   const defaultWeight = lastWeight ?? exercise.targetWeightSnapshot
 
@@ -44,9 +49,11 @@ export function FocusedExercise({
   const [reps, setReps] = useState<number | null>(DEFAULT_REPS)
   const [weight, setWeight] = useState<number | null>(defaultWeight)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [showLast, setShowLast] = useState(false)
 
   const restSeconds = exercise.restSecondsSnapshot ?? null
   const timer = useRestTimer()
+  const lastSession = useLastExerciseSession(exercise.exerciseId, exercise.workoutSessionId)
 
   async function handleSave() {
     await onRecordSet(weight, reps ?? DEFAULT_REPS)
@@ -59,9 +66,21 @@ export function FocusedExercise({
 
   return (
     <section className="screen focus">
-      <button type="button" className="focus__back" onClick={onBack} aria-label="Back to exercises">
-        ← Exercises
-      </button>
+      {/* Top bar: back on the left, "Done with Exercise" right-justified so it's
+          reachable without scrolling past the set controls. */}
+      <div className="focus__topbar">
+        <button
+          type="button"
+          className="focus__back"
+          onClick={onBack}
+          aria-label="Back to exercises"
+        >
+          ← Exercises
+        </button>
+        <button type="button" className="btn btn--ghost focus__done" onClick={onDone}>
+          Done with Exercise
+        </button>
+      </div>
 
       <h1 className="focus__name">{exercise.exerciseNameSnapshot}</h1>
       <p className="focus__target">
@@ -70,27 +89,61 @@ export function FocusedExercise({
           : 'Bodyweight'}
       </p>
 
-      {/* Large "current set" indicator */}
-      <div className="focus__set-indicator" aria-live="polite">
-        Set {nextSetNumber}
-      </div>
+      {/* Quick peek at the most recent completed session for THIS exercise. */}
+      {lastSession && (
+        <div className="focus__last">
+          <button
+            type="button"
+            className="focus__last-toggle"
+            onClick={() => setShowLast((v) => !v)}
+            aria-expanded={showLast}
+          >
+            <span>Last time · {timestampToLocalDate(lastSession.session.completedAt ?? '')}</span>
+            <span className="focus__last-chev" aria-hidden>
+              {showLast ? '▾' : '▸'}
+            </span>
+          </button>
+          {showLast && (
+            <ul className="focus__last-list">
+              {lastSession.sets.length === 0 ? (
+                <li className="focus__last-empty muted">No sets recorded</li>
+              ) : (
+                lastSession.sets.map((s) => (
+                  <li key={s.id} className="focus__last-item">
+                    <span className="focus__last-num">Set {s.setNumber}</span>
+                    <span className="focus__last-val">
+                      {s.weight !== null ? `${fmtWeight(s.weight)} lb × ` : ''}
+                      {s.reps} reps
+                    </span>
+                  </li>
+                ))
+              )}
+            </ul>
+          )}
+        </div>
+      )}
 
-      {/* Huge reps field — the primary input */}
-      <div className="focus__reps">
-        <label className="focus__reps-label" htmlFor="focus-reps">
-          Reps
-        </label>
-        <input
-          id="focus-reps"
-          className="focus__reps-input"
-          type="number"
-          inputMode="numeric"
-          min={0}
-          value={reps ?? ''}
-          onChange={(e) => setReps(e.target.value === '' ? null : Number(e.target.value))}
-          onFocus={(e) => e.target.select()}
-          aria-label={`Reps for set ${nextSetNumber}`}
-        />
+      {/* Current set: reps left-justified, set indicator alongside it. */}
+      <div className="focus__entry">
+        <div className="focus__reps">
+          <label className="focus__reps-label" htmlFor="focus-reps">
+            Reps
+          </label>
+          <input
+            id="focus-reps"
+            className="focus__reps-input"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            value={reps ?? ''}
+            onChange={(e) => setReps(e.target.value === '' ? null : Number(e.target.value))}
+            onFocus={(e) => e.target.select()}
+            aria-label={`Reps for set ${nextSetNumber}`}
+          />
+        </div>
+        <div className="focus__set-indicator" aria-live="polite">
+          Set {nextSetNumber}
+        </div>
       </div>
 
       {/* Secondary weight field */}
@@ -106,7 +159,11 @@ export function FocusedExercise({
         />
       </div>
 
-      <button type="button" className="btn btn--primary btn--block focus__save" onClick={handleSave}>
+      <button
+        type="button"
+        className="btn btn--primary btn--block focus__save"
+        onClick={handleSave}
+      >
         Save set {nextSetNumber}
       </button>
 
@@ -143,27 +200,30 @@ export function FocusedExercise({
         </div>
       )}
 
+      {/* Rest complete: a full-screen green wash, readable from across the room. */}
       {timer.finished && (
-        <div className="rest-timer rest-timer--done" role="alert">
-          <div className="rest-timer__count">0:00</div>
-          <div className="rest-timer__label">Rest complete — go!</div>
-          <div className="rest-timer__actions">
-            <button
-              type="button"
-              className="btn btn--ghost rest-timer__btn"
-              onClick={() => timer.add(30)}
-              aria-label="Rest 30 more seconds"
-            >
-              +30s
-            </button>
-            <button
-              type="button"
-              className="btn btn--ghost rest-timer__btn"
-              onClick={timer.skip}
-              aria-label="Dismiss rest timer"
-            >
-              Dismiss
-            </button>
+        <div className="rest-done" role="alert">
+          <div className="rest-done__inner">
+            <div className="rest-done__headline">GO!</div>
+            <div className="rest-done__label">Rest complete</div>
+            <div className="rest-done__actions">
+              <button
+                type="button"
+                className="btn rest-done__btn"
+                onClick={() => timer.add(30)}
+                aria-label="Rest 30 more seconds"
+              >
+                +30s
+              </button>
+              <button
+                type="button"
+                className="btn rest-done__btn"
+                onClick={timer.skip}
+                aria-label="Dismiss rest timer"
+              >
+                Dismiss
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -207,10 +267,6 @@ export function FocusedExercise({
           </ul>
         </div>
       )}
-
-      <button type="button" className="btn btn--ghost btn--block focus__done" onClick={onDone}>
-        Done with Exercise
-      </button>
     </section>
   )
 }
@@ -243,7 +299,11 @@ function EditRecordedSet({ set, onSave, onCancel, onDelete }: EditRecordedSetPro
         ariaLabel={`Edit reps for set ${set.setNumber}`}
       />
       <div className="focus__recorded-edit-actions">
-        <button type="button" className="btn btn--primary" onClick={() => onSave(weight, reps ?? 0)}>
+        <button
+          type="button"
+          className="btn btn--primary"
+          onClick={() => onSave(weight, reps ?? 0)}
+        >
           Save
         </button>
         <button type="button" className="btn btn--ghost" onClick={onCancel}>

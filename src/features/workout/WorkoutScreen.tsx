@@ -51,6 +51,9 @@ export function WorkoutScreen() {
     const ex = view.exercises[focusIndex]
     return (
       <FocusedExercise
+        // Keyed by exercise so the draft weight/reps state is rebuilt from THIS
+        // exercise's target instead of leaking over from the previous one.
+        key={ex.id}
         exercise={ex}
         onRecordSet={async (weight, reps) => {
           await addSet(ex.id, { weight, reps })
