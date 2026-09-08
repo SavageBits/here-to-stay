@@ -6,6 +6,7 @@ import { db } from '../../data/db'
 import { seedIfEmpty } from '../../data/seed'
 import { addSet, completeSession, startSession } from '../../data/repositories/sessionRepo'
 import { setAfterExercise } from '../../data/repositories/settingsRepo'
+import { getTemplate, listTemplateExercises } from '../../data/repositories/templateRepo'
 import { WorkoutScreen } from './WorkoutScreen'
 
 /**
@@ -169,5 +170,45 @@ describe('last session panel', () => {
     await waitFor(() => expect(screen.getByText('Set 2')).toBeInTheDocument())
 
     expect(screen.queryByRole('button', { name: /Last time/ })).not.toBeInTheDocument()
+  })
+})
+
+describe('rest complete cue', () => {
+  it('washes the screen green with nothing to dismiss, and clears on the next save', async () => {
+    const user = userEvent.setup()
+    // Give Back Squat a 1-second rest timer.
+    const template = (await getTemplate('B', db))!
+    const rows = await listTemplateExercises(template.id, db)
+    const allExercises = await db.exercises.toArray()
+    const squatEx = allExercises.find((e) => e.name === 'Back Squat')!
+    const squatRow = rows.find((r) => r.exerciseId === squatEx.id)!
+    await db.templateExercises.update(squatRow.id, { restSeconds: 1 })
+
+    const { session } = await startSession('B', db)
+    renderAt(session.id)
+    await waitFor(() => expect(screen.getByText('Back Squat')).toBeInTheDocument())
+    await user.click(screen.getByText('Back Squat'))
+
+    await user.click(screen.getByRole('button', { name: 'Save set 1' }))
+
+    // Once rest elapses the whole section turns green.
+    const section = await waitFor(
+      () => {
+        const el = document.querySelector('.focus--rest-done')
+        expect(el).not.toBeNull()
+        return el!
+      },
+      { timeout: 3000 },
+    )
+
+    // The cue is passive: no dismiss affordance, and the primary control is
+    // still directly tappable (no blocking overlay).
+    expect(screen.queryByRole('button', { name: /Dismiss/i })).not.toBeInTheDocument()
+    const save = screen.getByRole('button', { name: 'Save set 2' })
+    expect(section.contains(save)).toBe(true)
+
+    // Saving the next set clears the green on its own — no extra tap.
+    await user.click(save)
+    await waitFor(() => expect(document.querySelector('.focus--rest-done')).toBeNull())
   })
 })

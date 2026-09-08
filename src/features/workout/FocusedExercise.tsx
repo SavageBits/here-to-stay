@@ -65,7 +65,9 @@ export function FocusedExercise({
   }
 
   return (
-    <section className="screen focus">
+    // When rest is up the whole screen washes green — visible from across the
+    // room with nothing to tap. Saving the next set clears it on its own.
+    <section className={`screen focus${timer.finished ? ' focus--rest-done' : ''}`}>
       {/* Top bar: back on the left, "Done with Exercise" right-justified so it's
           reachable without scrolling past the set controls. */}
       <div className="focus__topbar">
@@ -196,34 +198,6 @@ export function FocusedExercise({
             >
               Skip
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Rest complete: a full-screen green wash, readable from across the room. */}
-      {timer.finished && (
-        <div className="rest-done" role="alert">
-          <div className="rest-done__inner">
-            <div className="rest-done__headline">GO!</div>
-            <div className="rest-done__label">Rest complete</div>
-            <div className="rest-done__actions">
-              <button
-                type="button"
-                className="btn rest-done__btn"
-                onClick={() => timer.add(30)}
-                aria-label="Rest 30 more seconds"
-              >
-                +30s
-              </button>
-              <button
-                type="button"
-                className="btn rest-done__btn"
-                onClick={timer.skip}
-                aria-label="Dismiss rest timer"
-              >
-                Dismiss
-              </button>
-            </div>
           </div>
         </div>
       )}
