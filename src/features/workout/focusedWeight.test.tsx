@@ -31,6 +31,11 @@ async function resetDb() {
 beforeEach(resetDb)
 afterEach(resetDb)
 
+/** The focused view's current set number ("Set" label + static number). */
+function setNumber(): string | null {
+  return document.querySelector('.focus__set-number')?.textContent?.trim() ?? null
+}
+
 function renderAt(sessionId: string) {
   return render(
     <MemoryRouter initialEntries={[`/workout/${sessionId}`]}>
@@ -121,6 +126,30 @@ describe('focused view working weight', () => {
   })
 })
 
+describe('entry row', () => {
+  it('stacks a "Set" label over a static set number, styled like the field labels', async () => {
+    const user = userEvent.setup()
+    const { session } = await startSession('B', db)
+    renderAt(session.id)
+    await waitFor(() => expect(screen.getByText('Back Squat')).toBeInTheDocument())
+    await user.click(screen.getByText('Back Squat'))
+
+    const label = screen.getByText('Set')
+    // Same label treatment as Reps/Weight.
+    expect(label).toHaveClass('focus__field-label')
+    expect(screen.getByText('Reps')).toHaveClass('focus__field-label')
+    expect(screen.getByText('Weight')).toHaveClass('focus__field-label')
+
+    // The number is static text, not an input.
+    const value = document.querySelector('.focus__set-number')!
+    expect(value.tagName).toBe('SPAN')
+    expect(value.textContent?.trim()).toBe('1')
+    // Label sits above the value in the same stacked cell.
+    expect(label.parentElement).toBe(value.parentElement)
+    expect(label.nextElementSibling).toBe(value)
+  })
+})
+
 describe('last session panel', () => {
   it('shows the most recent completed session for the focused exercise', async () => {
     const user = userEvent.setup()
@@ -153,7 +182,7 @@ describe('last session panel', () => {
 
     await waitFor(() => expect(screen.getByText('Back Squat')).toBeInTheDocument())
     await user.click(screen.getByText('Back Squat'))
-    await waitFor(() => expect(screen.getByText('Set 1')).toBeInTheDocument())
+    await waitFor(() => expect(setNumber()).toBe('1'))
 
     expect(screen.queryByRole('button', { name: /Last time/ })).not.toBeInTheDocument()
   })
@@ -167,7 +196,7 @@ describe('last session panel', () => {
     renderAt(session.id)
     await waitFor(() => expect(screen.getByText('Back Squat')).toBeInTheDocument())
     await user.click(screen.getByText('Back Squat'))
-    await waitFor(() => expect(screen.getByText('Set 2')).toBeInTheDocument())
+    await waitFor(() => expect(setNumber()).toBe('2'))
 
     expect(screen.queryByRole('button', { name: /Last time/ })).not.toBeInTheDocument()
   })

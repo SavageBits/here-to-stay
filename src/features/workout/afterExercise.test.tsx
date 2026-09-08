@@ -29,6 +29,11 @@ async function resetDb() {
 beforeEach(resetDb)
 afterEach(resetDb)
 
+/** The focused view's current set number ("Set" label + static number). */
+function setNumber(): string | null {
+  return document.querySelector('.focus__set-number')?.textContent?.trim() ?? null
+}
+
 function renderAt(sessionId: string) {
   return render(
     <MemoryRouter initialEntries={[`/workout/${sessionId}`]}>
@@ -49,14 +54,14 @@ describe('after-exercise behavior', () => {
 
     await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
     await user.click(screen.getByText('Deadlift'))
-    await waitFor(() => expect(screen.getByText('Set 1')).toBeInTheDocument())
+    await waitFor(() => expect(setNumber()).toBe('1'))
     await user.click(screen.getByRole('button', { name: 'Done with Exercise' }))
 
     // Focused view now shows the next exercise (Pull-up), still in focus mode.
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: 'Pull-up' })).toBeInTheDocument(),
     )
-    expect(screen.getByText('Set 1')).toBeInTheDocument()
+    expect(setNumber()).toBe('1')
   })
 
   it("'← Exercises' returns to the list WITHOUT cycling, even in 'next' mode", async () => {
@@ -67,7 +72,7 @@ describe('after-exercise behavior', () => {
 
     await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
     await user.click(screen.getByText('Deadlift'))
-    await waitFor(() => expect(screen.getByText('Set 1')).toBeInTheDocument())
+    await waitFor(() => expect(setNumber()).toBe('1'))
 
     await user.click(screen.getByRole('button', { name: 'Back to exercises' }))
 
@@ -88,7 +93,7 @@ describe('after-exercise behavior', () => {
 
     await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
     await user.click(screen.getByText('Deadlift'))
-    await waitFor(() => expect(screen.getByText('Set 1')).toBeInTheDocument())
+    await waitFor(() => expect(setNumber()).toBe('1'))
     await user.click(screen.getByRole('button', { name: 'Back to exercises' }))
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Complete Workout' })).toBeInTheDocument(),
@@ -107,7 +112,7 @@ describe('after-exercise behavior', () => {
 
     await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
     await user.click(screen.getByText('Deadlift'))
-    await waitFor(() => expect(screen.getByText('Set 1')).toBeInTheDocument())
+    await waitFor(() => expect(setNumber()).toBe('1'))
     // Leave without saving a set.
     await user.click(screen.getByRole('button', { name: 'Back to exercises' }))
     await waitFor(() =>

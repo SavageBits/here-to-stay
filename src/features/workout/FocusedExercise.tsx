@@ -125,10 +125,10 @@ export function FocusedExercise({
         </div>
       )}
 
-      {/* One entry row: reps and weight matched in size side by side, with the
-          set number alongside. Weight uses a bare input rather than NumberField
-          so it visually matches the reps field — it never holds more than three
-          digits, so a full-width control wasted the space. */}
+      {/* One entry row: reps, weight and the set number, each a stacked
+          label-over-value. Weight uses a bare input rather than NumberField so
+          it visually matches the reps field — neither holds more than three
+          digits, so full-width controls wasted the space. */}
       <div className="focus__entry">
         <div className="focus__field">
           <label className="focus__field-label" htmlFor="focus-reps">
@@ -166,8 +166,14 @@ export function FocusedExercise({
           />
         </div>
 
-        <div className="focus__set-indicator" aria-live="polite">
-          Set {nextSetNumber}
+        {/* Same stacked label/value shape as the fields, but the number is
+            static text — there is nothing to type here. A span, not a label,
+            since it labels no control. */}
+        <div className="focus__field focus__field--static">
+          <span className="focus__field-label">Set</span>
+          <span className="focus__set-number" aria-live="polite">
+            {nextSetNumber}
+          </span>
         </div>
       </div>
 

@@ -30,6 +30,11 @@ async function resetDb() {
 beforeEach(resetDb)
 afterEach(resetDb)
 
+/** The focused view's current set number ("Set" label + static number). */
+function setNumber(): string | null {
+  return document.querySelector('.focus__set-number')?.textContent?.trim() ?? null
+}
+
 function renderAt(sessionId: string) {
   return render(
     <MemoryRouter initialEntries={[`/workout/${sessionId}`]}>
@@ -62,13 +67,13 @@ describe('WorkoutScreen (focused redesign)', () => {
 
     // Enter the focused view.
     await user.click(screen.getByText('Dumbbell Incline Press'))
-    expect(screen.getByText('Set 1')).toBeInTheDocument()
+    expect(setNumber()).toBe('1')
     // Reps default to 12.
     expect((screen.getByLabelText('Reps for set 1') as HTMLInputElement).value).toBe('12')
 
     // Save set 1 — indicator advances to Set 2 in place (no appended rows).
     await user.click(screen.getByRole('button', { name: 'Save set 1' }))
-    await waitFor(() => expect(screen.getByText('Set 2')).toBeInTheDocument())
+    await waitFor(() => expect(setNumber()).toBe('2'))
     expect(screen.getByRole('button', { name: 'Save set 2' })).toBeInTheDocument()
 
     const count = await db.exerciseSets.where('workoutExerciseId').equals(incline.id).count()
@@ -108,11 +113,13 @@ describe('WorkoutScreen (focused redesign)', () => {
     await waitFor(() => expect(screen.getByText('Deadlift')).toBeInTheDocument())
 
     await user.click(screen.getByText('Deadlift'))
-    await waitFor(() => expect(screen.getByText('Set 1')).toBeInTheDocument())
+    await waitFor(() => expect(setNumber()).toBe('1'))
     await user.click(screen.getByRole('button', { name: 'Done with Exercise' }))
 
     // Back on the list; the exercise shows as done (✓).
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Complete Workout' })).toBeInTheDocument())
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Complete Workout' })).toBeInTheDocument(),
+    )
   })
 
   it('completing a successful workout advances the next target by 5', async () => {

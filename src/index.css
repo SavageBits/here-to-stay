@@ -717,7 +717,10 @@ a.btn {
    sitting them side by side is far denser than stacked full-width controls. */
 .focus__entry {
   display: flex;
-  align-items: flex-end;
+  /* Align on the label row so the labels sit on one line and the values below
+     them do too — the set number has no input box, so aligning on the bottom
+     edge instead would leave it hanging low. */
+  align-items: flex-start;
   justify-content: center;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
@@ -728,10 +731,18 @@ a.btn {
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
-  /* Share the row evenly, but never shrink past a comfortable 3-digit width. */
+  /* Share the row evenly, but stay narrow — three digits is the most any of
+     these ever holds. */
   flex: 1 1 0;
   min-width: 0;
-  max-width: 150px;
+  max-width: 118px;
+}
+
+/* The set number is display-only, so it needs no field chrome and only as much
+   width as its label. */
+.focus__field--static {
+  flex: 0 0 auto;
+  max-width: none;
 }
 
 .focus__field-label {
@@ -772,14 +783,16 @@ a.btn {
   font-weight: 600;
 }
 
-.focus__set-indicator {
-  font-size: 1.2rem;
+/* Sits on the same baseline as the field inputs, matching their type size, but
+   with no box — it is read, not edited. */
+.focus__set-number {
+  font-size: 2.75rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-  padding-bottom: 0.65rem;
-  white-space: nowrap;
-  flex: 0 0 auto;
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  /* Match the inputs' 2px border + 0.35rem padding so the digits line up. */
+  padding: calc(0.35rem + 2px) 0.25rem;
 }
 
 /* The most-tapped control in the app — sized for a confident thumb hit and
@@ -926,7 +939,7 @@ a.btn {
 
 /* Text needs to stay legible against the green. */
 .focus--rest-done .focus__name,
-.focus--rest-done .focus__set-indicator,
+.focus--rest-done .focus__set-number,
 .focus--rest-done .focus__field-label,
 .focus--rest-done .focus__target {
   color: #052e16;
