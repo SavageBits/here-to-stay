@@ -712,41 +712,37 @@ a.btn {
   font-size: 1.05rem;
 }
 
-/* Reps (left) and the set indicator (right) sit on one row, so the entry area
-   is compact and the rest of the view stays above the fold. */
+/* One entry row: reps and weight as equal-width twins with the set number
+   beside them. Neither field holds more than three digits, so matching them and
+   sitting them side by side is far denser than stacked full-width controls. */
 .focus__entry {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
+  justify-content: center;
+  gap: 0.75rem;
   margin-bottom: 1.25rem;
 }
 
-.focus__set-indicator {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-  padding-bottom: 0.5rem;
-  white-space: nowrap;
-}
-
-.focus__reps {
+.focus__field {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.35rem;
+  /* Share the row evenly, but never shrink past a comfortable 3-digit width. */
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 150px;
 }
 
-.focus__reps-label {
+.focus__field-label {
   color: var(--muted);
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
-.focus__reps-input {
-  width: 150px;
+.focus__field-input {
+  width: 100%;
   background: var(--surface-2);
   border: 2px solid var(--border);
   border-radius: var(--radius);
@@ -759,27 +755,40 @@ a.btn {
   -moz-appearance: textfield;
 }
 
-.focus__reps-input:focus {
+.focus__field-input:focus {
   outline: none;
   border-color: var(--accent);
 }
 
-/* Hide number spinners for the big reps field. */
-.focus__reps-input::-webkit-outer-spin-button,
-.focus__reps-input::-webkit-inner-spin-button {
+/* Hide number spinners — they steal width from the digits. */
+.focus__field-input::-webkit-outer-spin-button,
+.focus__field-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.focus__weight {
-  max-width: 320px;
-  width: 100%;
-  margin-bottom: 1.25rem;
+.focus__field-input::placeholder {
+  color: var(--muted);
+  font-weight: 600;
 }
 
-/* The most-tapped control in the app — sized for a confident thumb hit. */
+.focus__set-indicator {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  padding-bottom: 0.65rem;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+/* The most-tapped control in the app — sized for a confident thumb hit and
+   centred under the entry row. */
 .focus__save {
+  display: block;
+  width: 100%;
   max-width: 320px;
+  margin: 0 auto 1.25rem;
   min-height: 68px;
   font-size: 1.3rem;
   font-weight: 800;
@@ -918,7 +927,7 @@ a.btn {
 /* Text needs to stay legible against the green. */
 .focus--rest-done .focus__name,
 .focus--rest-done .focus__set-indicator,
-.focus--rest-done .focus__reps-label,
+.focus--rest-done .focus__field-label,
 .focus--rest-done .focus__target {
   color: #052e16;
 }

@@ -125,15 +125,18 @@ export function FocusedExercise({
         </div>
       )}
 
-      {/* Current set: reps left-justified, set indicator alongside it. */}
+      {/* One entry row: reps and weight matched in size side by side, with the
+          set number alongside. Weight uses a bare input rather than NumberField
+          so it visually matches the reps field — it never holds more than three
+          digits, so a full-width control wasted the space. */}
       <div className="focus__entry">
-        <div className="focus__reps">
-          <label className="focus__reps-label" htmlFor="focus-reps">
+        <div className="focus__field">
+          <label className="focus__field-label" htmlFor="focus-reps">
             Reps
           </label>
           <input
             id="focus-reps"
-            className="focus__reps-input"
+            className="focus__field-input"
             type="number"
             inputMode="numeric"
             min={0}
@@ -143,29 +146,32 @@ export function FocusedExercise({
             aria-label={`Reps for set ${nextSetNumber}`}
           />
         </div>
+
+        <div className="focus__field">
+          <label className="focus__field-label" htmlFor="focus-weight">
+            Weight
+          </label>
+          <input
+            id="focus-weight"
+            className="focus__field-input"
+            type="number"
+            inputMode="decimal"
+            min={0}
+            step={5}
+            value={weight ?? ''}
+            placeholder="—"
+            onChange={(e) => setWeight(e.target.value === '' ? null : Number(e.target.value))}
+            onFocus={(e) => e.target.select()}
+            aria-label={`Weight for set ${nextSetNumber}`}
+          />
+        </div>
+
         <div className="focus__set-indicator" aria-live="polite">
           Set {nextSetNumber}
         </div>
       </div>
 
-      {/* Secondary weight field */}
-      <div className="focus__weight">
-        <NumberField
-          label="Weight"
-          value={weight}
-          onChange={setWeight}
-          step={5}
-          suffix="lb"
-          placeholder="bodyweight"
-          ariaLabel={`Weight for set ${nextSetNumber}`}
-        />
-      </div>
-
-      <button
-        type="button"
-        className="btn btn--primary btn--block focus__save"
-        onClick={handleSave}
-      >
+      <button type="button" className="btn btn--primary focus__save" onClick={handleSave}>
         Save set {nextSetNumber}
       </button>
 
