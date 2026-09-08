@@ -204,6 +204,7 @@ describe('rest complete cue', () => {
     // The cue is passive: no dismiss affordance, and the primary control is
     // still directly tappable (no blocking overlay).
     expect(screen.queryByRole('button', { name: /Dismiss/i })).not.toBeInTheDocument()
+
     const save = screen.getByRole('button', { name: 'Save set 2' })
     expect(section.contains(save)).toBe(true)
 

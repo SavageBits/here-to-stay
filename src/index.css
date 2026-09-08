@@ -888,10 +888,11 @@ a.btn {
   font-size: 0.9rem;
 }
 
-/* ---- Rest complete: full-screen green wash ----
-   The timer ending recolors the whole viewport so it reads from across the
-   room. Painted as a non-interactive pseudo-element behind the content: there
-   is nothing to dismiss, and saving the next set clears it automatically. */
+/* ---- Rest complete: full-viewport green wash ----
+   The timer ending recolors the whole screen so it reads from across the room.
+   Static, not animated — it stays up while the next set is being performed, so
+   motion would be a distraction. Painted as a non-interactive pseudo-element:
+   nothing to dismiss, and saving the next set clears it automatically. */
 .focus--rest-done::before {
   content: '';
   position: fixed;
@@ -902,7 +903,6 @@ a.btn {
   z-index: 0;
   pointer-events: none;
   background: var(--success);
-  animation: rest-done-flash 1.1s ease-in-out infinite;
 }
 
 /* Lift the real content above the wash. */
@@ -911,14 +911,22 @@ a.btn {
   z-index: 1;
 }
 
-@keyframes rest-done-flash {
-  0%,
-  100% {
-    background: var(--success);
-  }
-  50% {
-    background: #15803d;
-  }
+/* The fixed bottom nav is a sibling of the screen, so it keeps its own opaque
+   background and would otherwise stay a dark band across the bottom. Green it
+   too so the wash really is the whole display. :has() is supported on modern
+   mobile Safari/Chrome; where it isn't, the nav simply stays dark. */
+.app-shell:has(.focus--rest-done) .bottom-nav {
+  background: var(--success);
+  border-top-color: #052e16;
+}
+
+.app-shell:has(.focus--rest-done) .nav-item {
+  color: #052e16;
+}
+
+.app-shell:has(.focus--rest-done) .nav-item--active {
+  color: #052e16;
+  font-weight: 700;
 }
 
 /* Text needs to stay legible against the green. */
@@ -929,11 +937,32 @@ a.btn {
   color: #052e16;
 }
 
-/* Respect reduced-motion: keep the strong color, drop the flashing. */
-@media (prefers-reduced-motion: reduce) {
-  .focus--rest-done::before {
-    animation: none;
-  }
+/* Dark card surfaces would punch holes in the wash — let the green through and
+   outline them instead, so the colored area stays as large as possible. */
+.focus--rest-done .focus__recorded-btn,
+.focus--rest-done .focus__last-toggle {
+  background: transparent;
+  border-color: #052e16;
+  color: #052e16;
+}
+
+.focus--rest-done .focus__recorded-title,
+.focus--rest-done .focus__recorded-num,
+.focus--rest-done .focus__recorded-val,
+.focus--rest-done .focus__last-num,
+.focus--rest-done .focus__last-val,
+.focus--rest-done .focus__last-chev {
+  color: #052e16;
+}
+
+/* "Done with Exercise" is a ghost button — keep it readable on green. */
+.focus--rest-done .focus__done {
+  border-color: #052e16;
+  color: #052e16;
+}
+
+.focus--rest-done .focus__back {
+  color: #052e16;
 }
 
 /* Compact recorded-sets summary. */
